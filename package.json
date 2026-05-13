@@ -7,7 +7,7 @@
   },
   "packageManager": "pnpm@10.33.0",
   "scripts": {
-    "dev": "astro dev",
+    "dev": "astro dev --port 4322",
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
@@ -22,11 +22,11 @@
     "vite": "^7"
   },
   "dependencies": {
-    "@astrojs/cloudflare": "^13.1.10",
-    "@astrojs/mdx": "^5.0.3",
+    "@astrojs/cloudflare": "^13.5.0",
+    "@astrojs/mdx": "^5.0.4",
     "@astrojs/sitemap": "^3.7.2",
     "@tailwindcss/vite": "^4.2.3",
-    "astro": "^6.1.8",
+    "astro": "^6.3.1",
     "cf-workers-og": "^3.0.1",
     "clsx": "^2.1.1",
     "tailwind-merge": "^3.5.0",
@@ -35,7 +35,7 @@
     "wrangler": "^4.84.0"
   },
   "devDependencies": {
-    "@astrojs/check": "^0.9.8",
+    "@astrojs/check": "^0.9.9",
     "@biomejs/biome": "2.4.12",
     "@types/hast": "^3.0.4",
     "@types/node": "^25.6.0",

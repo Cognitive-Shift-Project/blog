@@ -9,7 +9,7 @@ import { rehypeWrapTables } from './plugins/rehype/rehype-wrap-tables'
 
 const DEPLOY_DOMAIN = 'cognitive-shift-project.raphael-gabbay.workers.dev'
 const ASTRO_SITE = (
-	process.env.NODE_ENV === 'production' ? `https://${DEPLOY_DOMAIN}` : 'http://localhost:4321'
+	process.env.NODE_ENV === 'production' ? `https://${DEPLOY_DOMAIN}` : 'http://localhost:4322'
 ) satisfies AstroUserConfig['site']
 
 /**
@@ -31,7 +31,7 @@ export default defineConfig({
 	trailingSlash: 'ignore',
 	output: 'static',
 	devToolbar: {
-		enabled: false,
+		enabled: true,
 	},
 	build: {
 		format: 'directory',
