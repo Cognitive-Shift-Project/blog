@@ -4,7 +4,6 @@
     "strict": true,
     "strictNullChecks": true,
     "verbatimModuleSyntax": true,
-    "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
     }
