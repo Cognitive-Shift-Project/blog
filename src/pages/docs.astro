@@ -1,0 +1,148 @@
+---
+import Layout from '@/layouts/Layout.astro'
+
+const title = 'Documentation'
+const description = "Customizing AstroFlareOG's Open Graph Image Templates"
+---
+
+<Layout
+	meta={{
+		type: 'page',
+		title,
+		description,
+	}}
+>
+	<section>
+		<h1 class="text-h1 text-P-heading text-balance mb-4">{title}</h1>
+		<div class="text-lead text-P-lead text-pretty">
+			<p>{description}</p>
+		</div>
+		<section class="prose">
+			<h2>Open Graph Images</h2>
+			<p>
+				This theme generates OG images on Cloudflare Workers thanks to the <a
+					href="https://github.com/jillesme/cf-workers-og"
+					target="_blank"
+					rel="noopener noreferrer"><code>cf-workers-og</code></a
+				> package by Jilles Soeters <span class="whitespace-nowrap"
+					>(GitHub: <a href="https://github.com/jillesme" target="_blank" rel="noopener noreferrer"
+						><code>@jillesme</code></a
+					>)</span
+				>.
+			</p>
+			<p>
+				Soeters' package uses <code>@resvg/resvg-wasm</code> with patched versions of <code>satori</code> and
+				<code>yoga-layout</code> to perform its magic.
+			</p>
+			<p>
+				Although this is a new package it is very well-written by an experienced developer who works in a technical role
+				at Cloudflare.
+			</p>
+			<p>
+				The image <code>Response</code> returned by the library includes <code>Cache-Control</code> headers so Cloudflare
+				will cache them for a long time and minimize requests to the Worker.
+			</p>
+			<h2>Customizing Fonts</h2>
+			<p></p>
+			<h3>Web Fonts</h3>
+			<p>AstroFlareOG uses the Astro Font Provider API to load and optimize web fonts for use in HTML and CSS.</p>
+			<p>
+				The theme uses the <em>Atkinson</em> family of variable fonts obtained from <a
+					href="https://fontsource.org/"
+					target="_blank"
+					rel="noopener noreferrer">Fontsource</a
+				>.
+			</p>
+			<p>Key files:</p>
+			<ul>
+				<li><code>astro.config.ts</code> &mdash; see <code>fonts</code> configuration</li>
+				<li>
+					<code>Layout.astro</code> &mdash; renders <code>{`<Font />`}</code> components from <code>astro:assets</code>
+				</li>
+				<li>
+					<code>global.css</code> &mdash; TailwindCSS theme registration of <code>sans</code> and <code>mono</code> fonts
+				</li>
+			</ul>
+			<p>
+				The Font Provider API has built-in support for a number of popular providers including Adobe, Bunny, Fontsource,
+				Google, NPM, etc., plus the local <code>src/assets/</code> directory.
+			</p>
+			<ul aria-label="Astro Fonts Documentation Links">
+				<li>
+					<a href="https://docs.astro.build/en/guides/fonts/" target="_blank" rel="noopener noreferrer"
+						>Astro Fonts Docs</a
+					>
+				</li>
+				<li>
+					<a
+						href="https://docs.astro.build/en/reference/font-provider-reference/"
+						target="_blank"
+						rel="noopener noreferrer">Astro Font Provider Reference</a
+					>
+				</li>
+			</ul>
+			<h3>Open Graph Image Fonts</h3>
+			<p>
+				Satori does <strong>not</strong> support variable fonts nor the WOFF2 format so a different font solution is necessary
+				for OG image templates.
+			</p>
+			<p>Currently supported formats: <code>*.woff</code>, <code>*.ttf</code>, <code>*.otf</code></p>
+			<p>
+				<code>cf-workers-og</code> supports loading supported font formats from Custom Sources and Google Fonts.
+			</p>
+			<p>
+				AstroFlareOG uses a Custom Source: supported non-variable <code>*.woff</code>
+				versions of fonts from the <em>Atkinson</em> family are in the <code>public/fonts/</code> directory family for use
+				in OG image templates.
+			</p>
+			<p>
+				<code>@/lib/og/fonts.ts</code> exports a <code>loadLocalFont()</code> utility that fetches the fonts via Cloudflare
+				<code>ASSETS</code> binding.
+			</p>
+			<p>
+				The <code>@/pages/og.png.ts</code> and <code>@/pages/blog/[slug]/og.png.ts</code> routes where the fonts are loaded,
+				the OG image template is imported, and <code>cf-workers-og</code> is invoked to generate the image response.
+			</p>
+			<p>Refer to <code>cf-workers-og</code> repo for more on Google Fonts:</p>
+			<ul>
+				<li>
+					<a href="https://github.com/jillesme/cf-workers-og" target="_blank" rel="noopener noreferrer"
+						>jillesme/cf-workers-og</a
+					> (GitHub Repo &mdash; See README)
+				</li>
+				<li>
+					<a
+						href="https://github.com/jillesme/cf-workers-og/tree/main/examples/worker"
+						target="_blank"
+						rel="noopener noreferrer">example worker</a
+					> (GitHub Repo &mdash; example code)
+				</li>
+			</ul>
+			<h2>Customizing Image Templates</h2>
+			<p>
+				See <code>@/lib/og/*-template.ts</code> files for the functions that generate the OG image templates as HTML templates.
+			</p>
+			<p><code>cf-workers-og</code> also supports rendering React JSX for Astro projects that use React components.</p>
+			<p>
+				There are <strong>many</strong> restrictions to observe with <code>resvg</code> and <code>satori</code>.
+			</p>
+			<p>
+				Notable restrictions include inline styles, flexbox for layout, and a limited set of supported CSS properties
+				and HTML elements.
+			</p>
+			<p>Refer to project documentation and README's:</p>
+			<ul>
+				<li>
+					<a href="https://github.com/vercel/satori" target="_blank" rel="noopener noreferrer"
+						>https://github.com/vercel/satori</a
+					>
+				</li>
+				<li>
+					<a href="https://github.com/thx/resvg-js" target="_blank" rel="noopener noreferrer"
+						>https://github.com/thx/resvg-js</a
+					>
+				</li>
+			</ul>
+		</section>
+	</section>
+</Layout>

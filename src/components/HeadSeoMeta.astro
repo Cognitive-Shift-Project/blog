@@ -1,0 +1,63 @@
+---
+import {} from '@/constants'
+import {} from '@/constants'
+import {
+	SITE_URL,
+	BASE_PATHNAME,
+	META_TITLE,
+	META_DESCRIPTION,
+	OG_TWITTER_SITE_HANDLE,
+	OG_TWITTER_CREATOR_HANDLE,
+} from '@/constants'
+import { ensureTrailingSlash, stripTrailingSlashes } from '@/lib/slashes'
+import type { SeoMeta, SeoMetaType } from '@/seo.types'
+
+/**
+ * Render title, description, and social meta tags including Open Graph and Twitter Card.
+ * This component should only be rendered inside the document `<head>..</head>`.
+ *
+ * The document title is suffixed with the site's `META_TITLE` when `meta.title` is provided,
+ * otherwise it falls back to `META_TITLE`.
+ *
+ * @see constants.ts
+ */
+type Props = {
+	canonicalUrl: string | URL
+	meta?: SeoMeta<SeoMetaType> | undefined
+}
+
+const { canonicalUrl, meta } = Astro.props as Props
+const { title, description } = meta ?? {}
+
+const isIndexPage = ensureTrailingSlash(Astro.url.pathname) === ensureTrailingSlash(BASE_PATHNAME)
+
+const headTitle = isIndexPage ? META_TITLE : title ? `${title} · ${META_TITLE}` : META_TITLE
+const headDescription = isIndexPage ? META_DESCRIPTION : description?.trim() || undefined
+
+const ogImageUrl = meta?.ogImageUrl
+	? new URL(meta.ogImageUrl, Astro.site)
+	: new URL(`${stripTrailingSlashes(SITE_URL)}/og.png`, Astro.site)
+
+const ogType = meta?.type === 'blog' ? 'article' : 'website'
+const ogTitle = title || META_TITLE
+const ogSiteName = META_TITLE
+const ogDescription = headDescription
+---
+
+<title>{headTitle}</title>
+{headDescription && <meta name="description" content={headDescription} />}
+
+<meta property="og:type" content={ogType} />
+<meta property="og:url" content={canonicalUrl} />
+<meta property="og:image" content={ogImageUrl} />
+<meta property="og:site_name" content={ogSiteName} />
+<meta property="og:title" content={ogTitle} />
+{ogDescription && <meta property="og:description" content={ogDescription} />}
+
+<meta property="twitter:card" content="summary_large_image" />
+<meta property="twitter:url" content={canonicalUrl} />
+<meta property="twitter:image" content={ogImageUrl} />
+<meta property="twitter:title" content={ogTitle} />
+{ogDescription && <meta property="twitter:description" content={ogDescription} />}
+{OG_TWITTER_SITE_HANDLE && <meta property="twitter:site" content={OG_TWITTER_SITE_HANDLE} />}
+{OG_TWITTER_CREATOR_HANDLE && <meta property="twitter:creator" content={OG_TWITTER_CREATOR_HANDLE} />}

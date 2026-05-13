@@ -1,0 +1,99 @@
+@import "tailwindcss";
+@import "./palette.css" layer(base);
+@import "./typography.css";
+
+@source "../**/*.{ts,tsx,astro}";
+
+@theme inline {
+	--font-heading: var(--font-atkinson-next), system-ui, sans-serif;
+	--font-sans: var(--font-atkinson-next), system-ui, sans-serif;
+	--font-mono: var(--font-atkinson-mono), ui-monospace, monospace;
+}
+
+@theme {
+	--max-width-prose: 65ch;
+	--text-tiny: 0.625rem;
+	--text-tiny--line-height: calc(1 / 0.625);
+}
+
+:root {
+	--layout-max-width: var(--container-4xl);
+	--layout-header-height: calc(var(--spacing) * 14);
+	--layout-footer-height: calc(var(--spacing) * 14);
+
+	color: var(--P-fg);
+	background-color: var(--P-bg);
+}
+
+@layer base {
+	@media (prefers-reduced-motion: reduce) {
+		::view-transition-old(root),
+		::view-transition-new(root) {
+			animation-duration: 0ms;
+		}
+	}
+
+	* {
+		scrollbar-color: var(--P-scrollbar-thumb) var(--P-scrollbar-track);
+		scrollbar-width: thin;
+		@apply border-P-border outline-P-ring/50;
+	}
+
+	html {
+		scrollbar-color: var(--P-scrollbar-thumb) var(--P-scrollbar-track);
+		scrollbar-gutter: stable both-edges;
+		scrollbar-width: thin;
+
+		@apply scroll-smooth scroll-pt-24;
+	}
+
+	body {
+		@apply relative antialiased font-sans text-base;
+		@apply selection:bg-P-selection selection:text-P-selection-fg;
+	}
+}
+
+/*
+ * Scroll fade — edges fade out as content overflows horizontally.
+ * Uses CSS scroll-driven animations. Degrades to no fade in Firefox.
+ */
+
+@property --scroll-fade-left {
+	syntax: "<length>";
+	inherits: false;
+	initial-value: 0px;
+}
+
+@property --scroll-fade-right {
+	syntax: "<length>";
+	inherits: false;
+	initial-value: 0px;
+}
+
+@keyframes scroll-fade-x {
+	0% {
+		--scroll-fade-left: 0px;
+		--scroll-fade-right: 3rem;
+	}
+	10%,
+	90% {
+		--scroll-fade-left: 3rem;
+		--scroll-fade-right: 3rem;
+	}
+	100% {
+		--scroll-fade-left: 3rem;
+		--scroll-fade-right: 0px;
+	}
+}
+
+@utility scroll-fade-x {
+	mask: linear-gradient(
+		to right,
+		transparent,
+		black var(--scroll-fade-left),
+		black calc(100% - var(--scroll-fade-right)),
+		transparent
+	);
+	animation: scroll-fade-x linear;
+	animation-timeline: scroll(self inline);
+}

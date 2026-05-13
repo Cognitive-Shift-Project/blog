@@ -1,0 +1,269 @@
+/*
+ * Custom text size utilities including text-h1 to text-h6 utilities that enable consistent
+ * heading styles both inside and outside of prose blocks.
+ */
+@theme {
+	--text-tiny: 0.625rem;
+	--text-tiny--line-height: 1.5rem;
+	--text-tiny--letter-spacing: 0.125rem;
+	--text-tiny--font-weight: 500;
+
+	--text-lead: clamp(1.0625em, 0.9125em + 0.75vw, 1.25em);
+	--text-lead--line-height: 1.4;
+	--text-lead--letter-spacing: -0.0125em;
+	--text-lead--font-weight: 400;
+
+	--text-h1: clamp(1.75em, 1.25em + 2.5vw, 2.25em);
+	--text-h1--line-height: 1.15;
+	--text-h1--letter-spacing: -0.03em;
+	--text-h1--font-weight: 700;
+
+	--text-h2: clamp(1.375em, 1.1em + 1.4vw, 1.625em);
+	--text-h2--line-height: 1.25;
+	--text-h2--letter-spacing: -0.025em;
+	--text-h2--font-weight: 700;
+
+	--text-h3: 1.25em;
+	--text-h3--line-height: 1.35;
+	--text-h3--letter-spacing: -0.015em;
+	--text-h3--font-weight: 600;
+
+	--text-h4: 1.0625em;
+	--text-h4--line-height: 1.4;
+	--text-h4--letter-spacing: -0.01em;
+	--text-h4--font-weight: 600;
+
+	--text-h5: 0.875em;
+	--text-h5--line-height: 1.4;
+	--text-h5--letter-spacing: 0.025em;
+	--text-h5--font-weight: 700;
+
+	--text-h6: 0.8125em;
+	--text-h6--line-height: 1.4;
+	--text-h6--letter-spacing: 0.025em;
+	--text-h6--font-weight: 700;
+}
+
+/*
+ * Custom `prose` Tailwind v4 utility for import by `global.css`.
+ *
+ * Uses rem vs. em units (unlike tailwind's official prose plugin) for simplicity and a
+ * more predictable and consistent vertical rhythm, plus heading consistency outside of prose blocks.
+ *
+ * Usage:
+ *  <article class="prose">…</article>
+ *  <div class="not-prose">…</div>  (escape hatch to use within parent .prose blocks)
+ *
+ * All descendant selectors use :where() so they have zero specificity.
+ *
+ * Code fence blocks are styled via astro + shiki (refer to astro config and docs).
+ * Remember Astro's new CSP feature (enabled via astro config) is not currently compatible with shiki.
+ */
+@utility prose {
+	@apply max-w-prose text-lg leading-[1.75] text-pretty text-P-fg;
+
+	/* integrate with layout which wraps in <article> and renders <header> with meta */
+	/* this lets the article > header fully own the space before <Content> */
+
+	& :where(header + *):not(:where(.not-prose, .not-prose *)) {
+		@apply mt-0;
+	}
+
+	/* paragraphs */
+
+	& :where(p):not(:where(.not-prose, .not-prose *)) {
+		@apply mb-[1.5em];
+	}
+
+	& :where(:is(h1, h2, h3, h4, h5, h6) + p):not(:where(.not-prose, .not-prose *)) {
+		@apply mt-0;
+	}
+
+	/* headings (shared) */
+
+	& :where(h1, h2, h3, h4, h5, h6):not(:where(.not-prose, .not-prose *)) {
+		@apply text-balance text-P-heading font-heading;
+	}
+
+	& :where(h1):not(:where(.not-prose, .not-prose *)) {
+		@apply text-h1;
+		@apply mt-0 mb-[0.444em];
+	}
+
+	& :where(h2):not(:where(.not-prose, .not-prose *)) {
+		@apply text-h2;
+		@apply mt-[1.75em] mb-[0.615em];
+	}
+
+	& :where(h3):not(:where(.not-prose, .not-prose *)) {
+		@apply text-h3;
+		@apply mt-[1.8em] mb-[0.6em];
+	}
+
+	& :where(h4):not(:where(.not-prose, .not-prose *)) {
+		@apply text-h4;
+		@apply mt-[1.647em] mb-[0.471em];
+	}
+
+	& :where(h5):not(:where(.not-prose, .not-prose *)) {
+		@apply text-h5 uppercase;
+		@apply mt-[1.714em] mb-[0.571em];
+	}
+
+	& :where(h6):not(:where(.not-prose, .not-prose *)) {
+		@apply text-h6 uppercase;
+		@apply mt-[1.846em] mb-[0.615em];
+	}
+
+	/* avoid double-spacing when headings follow headings */
+	& :where(:is(h1, h2, h3, h4, h5, h6) + :is(h2, h3, h4, h5, h6)):not(:where(.not-prose, .not-prose *)) {
+		@apply mt-[0.75em];
+	}
+
+	/* links */
+
+	& :where(a):not(:where(.not-prose, .not-prose *)) {
+		@apply font-medium underline decoration-current decoration-1 underline-offset-[0.2em];
+		@apply transition-[color,text-decoration-thickness] duration-150 ease-in-out;
+		@apply text-P-link;
+	}
+
+	& :where(a):hover:not(:where(.not-prose, .not-prose *)) {
+		@apply decoration-[1.5px] text-P-link-hover;
+	}
+
+	/* blockquote */
+
+	& :where(blockquote):not(:where(.not-prose, .not-prose *)) {
+		@apply italic my-[1.5em] ps-[1.5em] border-s-2 border-P-border text-P-lead;
+	}
+
+	& :where(blockquote p):not(:where(.not-prose, .not-prose *)) {
+		@apply mb-[0.5em];
+	}
+
+	& :where(blockquote p:last-child):not(:where(.not-prose, .not-prose *)) {
+		@apply mb-0;
+	}
+
+	/* lists */
+
+	& :where(ul, ol):not(:where(.not-prose, .not-prose *)) {
+		@apply mb-[1.5em] ps-[1.5em] marker:text-P-bullet;
+	}
+
+	& :where(ul > li):not(:where(.not-prose, .not-prose *)) {
+		@apply list-disc;
+	}
+
+	& :where(ol > li):not(:where(.not-prose, .not-prose *)) {
+		@apply list-decimal;
+	}
+
+	& :where(li):not(:where(.not-prose, .not-prose *)) {
+		@apply mb-[0.375em];
+	}
+
+	& :where(li > ul, li > ol):not(:where(.not-prose, .not-prose *)) {
+		@apply my-[0.375em];
+	}
+
+	/* code */
+
+	/* inline code not inside a pre block */
+	& :where(:not(pre) > code):not(:where(.not-prose, .not-prose *)) {
+		@apply font-mono rounded-[3px] text-[0.85em] py-[0.125em] px-[0.28125em];
+		@apply bg-P-code text-P-code-fg;
+	}
+
+	/* code elements inside anchor inherits link colors */
+	& :where(a code):not(:where(.not-prose, .not-prose *)) {
+		@apply text-inherit;
+	}
+
+	/* code fence blocks with important override of astro-shiki background */
+	& :where(pre):not(:where(.not-prose, .not-prose *)) {
+		@apply overflow-x-auto rounded-lg leading-normal my-[1.5em];
+		@apply py-4 px-5 sm:py-5 sm:px-6;
+		@apply bg-P-code/25! border border-P-border;
+		@apply scroll-fade-x;
+	}
+
+	& :where(pre code):not(:where(.not-prose, .not-prose *)) {
+		@apply p-0 text-[0.8125em] bg-transparent bg-none;
+	}
+
+	/* horizontal rule */
+
+	& :where(hr):not(:where(.not-prose, .not-prose *)) {
+		@apply border-0 my-[2.5em] border-bs border-P-border;
+	}
+
+	/* media */
+
+	& :where(img, video):not(:where(.not-prose, .not-prose *)) {
+		@apply rounded-lg w-full my-[1.5em];
+	}
+
+	& :where(figure):not(:where(.not-prose, .not-prose *)) {
+		@apply my-[1.5em];
+	}
+
+	& :where(figcaption):not(:where(.not-prose, .not-prose *)) {
+		@apply text-center text-[0.875em] mt-[0.5em] text-P-lead;
+	}
+
+	/* inline semantics */
+
+	& :where(strong):not(:where(.not-prose, .not-prose *)) {
+		@apply font-bold text-P-strong;
+	}
+
+	& :where(mark):not(:where(.not-prose, .not-prose *)) {
+		@apply rounded-sm py-[0.125em] px-[0.25em] text-inherit bg-P-highlight;
+	}
+
+	& :where(abbr):not(:where(.not-prose, .not-prose *)) {
+		@apply cursor-help underline decoration-dotted underline-offset-[0.25em] decoration-current/75;
+	}
+
+	& :where(kbd):not(:where(.not-prose, .not-prose *)) {
+		@apply font-semibold border rounded-sm text-[0.8125em] py-[0.125em] px-[0.375em];
+		@apply text-P-lead bg-P-muted border-P-border;
+	}
+
+	& :where(del):not(:where(.not-prose, .not-prose *)) {
+		@apply opacity-60 line-through;
+	}
+
+	& :where(sup, sub):not(:where(.not-prose, .not-prose *)) {
+		@apply text-[0.75em] leading-none;
+	}
+
+	/* table (assumes wrapper with .table-wrapper added via rehype plugin) */
+
+	& :where(.table-wrapper):not(:where(.not-prose, .not-prose *)) {
+		@apply my-[1.5em] overflow-x-auto rounded-lg border border-P-border;
+		@apply scroll-fade-x;
+	}
+
+	& :where(table):not(:where(.not-prose, .not-prose *)) {
+		@apply w-full table-auto border-collapse text-[0.9375em];
+	}
+
+	& :where(th):not(:where(.not-prose, .not-prose *)) {
+		@apply font-semibold text-start py-[0.5em] px-[0.75em] bg-P-muted border-be border-P-border;
+	}
+
+	& :where(td):not(:where(.not-prose, .not-prose *)) {
+		@apply py-[0.5em] px-[0.75em] border-be border-P-border;
+	}
+
+	& :where(tbody tr:last-child td):not(:where(.not-prose, .not-prose *)) {
+		@apply border-be-0;
+	}
+}
+
+@utility not-prose {
+	--not-prose: 1;
+}

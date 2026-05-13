@@ -1,0 +1,167 @@
+{
+	// remember to update schema version when updating biome to avoid conflicts
+	//
+	// astro files are ignored to defer to the official astro vscode extension
+	// which uses prettier + prettier-plugin-astro under the hood and respects the prettier config
+	//
+	"$schema": "https://biomejs.dev/schemas/2.4.12/schema.json",
+	"vcs": {
+		"enabled": true,
+		"clientKind": "git",
+		"defaultBranch": "main",
+		"useIgnoreFile": true
+	},
+	"files": {
+		"ignoreUnknown": true,
+		"includes": [
+			"**",
+			"!**/node_modules",
+			"!**/coverage",
+			"!**/build",
+			"!**/dist",
+			"!**/.astro",
+			"!**/.cache",
+			"!**/.svelte-kit",
+			"!**/.turbo",
+			"!**/.wrangler",
+			"!**/*.astro",
+			"!pnpm-lock.yaml",
+			"!pnpm-workspace.yaml",
+			"!package-lock.json",
+			"!yarn.lock",
+			"!.DS_Store",
+			"!worker-configuration.d.ts"
+		]
+	},
+	"formatter": {
+		"enabled": true,
+		"indentStyle": "tab",
+		"lineWidth": 120,
+		"formatWithErrors": true,
+		"lineEnding": "lf"
+	},
+	"assist": {
+		"enabled": true,
+		"actions": {
+			"recommended": true,
+			"source": {
+				"useSortedAttributes": "off", // preference for logical grouping over strict sorting
+				"useSortedProperties": "off", // can interfere with logical grouping of css classes and object properties
+				"useSortedKeys": "off", // causes more problems than it solves in current biome
+				"organizeImports": {
+					"level": "on",
+					"options": {
+						"identifierOrder": "natural",
+						"groups": [
+							// warning :BLANK_LINE: will clobber astro files if biome is configured to process them (issue #9097)
+							// prettier with prettier-plugin-astro is used for astro files (same as the astro vscode extension)
+							[":NODE:", ":BUN:", "cloudflare:*"],
+							":BLANK_LINE:",
+							["astro", "astro/*", "astro:*"],
+							["@astrojs/*", "@astro*/*", "astro-*"],
+							["react", "react-dom", "react*/**", "@react*/**"],
+							["next", "next/**", "@next/*"],
+							["vite", "vite/**", "@vitejs/*", "vite-*"],
+							["@tanstack/*", "@tanstack/**"],
+							["hono", "hono/**", "@hono/*", "@hono/**"],
+							[":URL:", ":PACKAGE_WITH_PROTOCOL:", ":PACKAGE:", "!@repo/**", "!@workspace/**"],
+							":BLANK_LINE:",
+							[":ALIAS:", ":PATH:"]
+						]
+					}
+				}
+			}
+		}
+	},
+	"linter": {
+		"enabled": true,
+		"rules": {
+			"recommended": true,
+			"style": {
+				"useNodejsImportProtocol": "error",
+				"useImportType": "error",
+				"useExportType": "error",
+				"useNumberNamespace": "warn"
+			},
+			"nursery": {
+				// tailwind class sorting
+				"useSortedClasses": {
+					"level": "warn",
+					"options": {
+						"functions": ["clsx", "cva", "cn", "cx", "tv", "tw"]
+					}
+				}
+			}
+		}
+	},
+	"html": {
+		"experimentalFullSupportEnabled": false, // too buggy for astro (prefer astro extension w/ prettier)
+		"formatter": { "enabled": true, "indentScriptAndStyle": true } // enable handling of raw html files
+	},
+	"css": {
+		"parser": {
+			"tailwindDirectives": true,
+			"cssModules": false,
+			"allowWrongLineComments": false
+		}
+	},
+	"javascript": {
+		"formatter": {
+			"quoteStyle": "single",
+			"trailingCommas": "all",
+			"semicolons": "asNeeded",
+			"jsxQuoteStyle": "double"
+		}
+	},
+	"json": {
+		"formatter": {
+			"enabled": true,
+			"trailingCommas": "none"
+		},
+		"parser": {
+			"allowComments": false,
+			"allowTrailingCommas": false
+		}
+	},
+	"overrides": [
+		// looser rules for test files
+		{
+			"includes": [
+				"**/*.test.ts",
+				"**/*.test.tsx",
+				"**/*.spec.ts",
+				"**/*.spec.tsx",
+				"**/__tests__/**",
+				"**/e2e/**",
+				"**/*.e2e.ts"
+			],
+			"linter": {
+				"rules": {
+					"suspicious": { "noExplicitAny": "off" },
+					"style": { "noNonNullAssertion": "off" }
+				}
+			}
+		},
+		// match tooling (pnpm, tsc --init, etc) defaults to prevent noisy diffs
+		{
+			"includes": ["**/package.json", "**/tsconfig*.json"],
+			"json": {
+				"formatter": {
+					"indentStyle": "space",
+					"indentWidth": 2,
+					"trailingCommas": "none"
+				}
+			}
+		},
+		// ensure jsonc config files are correctly understood
+		{
+			"includes": ["**/.vscode/**/*.json", "**/tsconfig*.json", "**/*.jsonc"],
+			"json": {
+				"parser": {
+					"allowComments": true,
+					"allowTrailingCommas": true
+				}
+			}
+		}
+	]
+}

@@ -1,0 +1,26 @@
+---
+import type { HTMLAttributes } from 'astro/types'
+import { type DateFormat, DEFAULT_DATE_FORMAT, DEFAULT_LOCALE } from '@/constants'
+import { formatDate } from '@/lib/dates'
+
+interface Props extends HTMLAttributes<'time'> {
+	date: Date
+	format?: DateFormat | undefined
+	prefix?: string | undefined
+	class?: string | undefined
+	locale?: Intl.LocalesArgument | undefined
+}
+
+const {
+	date,
+	format = DEFAULT_DATE_FORMAT,
+	prefix = '',
+	class: className,
+	locale = Astro.currentLocale || DEFAULT_LOCALE,
+	...restProps
+} = Astro.props
+---
+
+<time datetime={date.toISOString()} class={className} {...restProps}>
+	{prefix}{formatDate(date, format, locale)}
+</time>

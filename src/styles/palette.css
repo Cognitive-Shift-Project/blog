@@ -1,0 +1,44 @@
+@theme inline {
+	/* global layout */
+	--color-P-bg: var(--color-neutral-50);
+	--color-P-fg: var(--color-neutral-800);
+
+	/* global ui chrome */
+	--color-P-selection: var(--color-sky-200);
+	--color-P-selection-fg: var(--color-neutral-900);
+	--color-P-scrollbar-track: transparent;
+	--color-P-scrollbar-thumb: var(--color-neutral-300);
+
+	/* typographical */
+	--color-P-lead: var(--color-neutral-600);
+	--color-P-subtle: var(--color-neutral-500);
+	--color-P-bullet: var(--color-neutral-600);
+	--color-P-heading: var(--color-neutral-700);
+	--color-P-strong: var(--color-neutral-700);
+	--color-P-link: var(--color-sky-700);
+	--color-P-link-hover: oklch(54.40% 0.146 242.36); /* precomputed 50% color-mix to sky-800 */
+
+	/* highlight (<mark>) */
+	--color-P-highlight: var(--color-yellow-200);
+
+	/* core ui */
+	--color-P-border: var(--color-neutral-200);
+	--color-P-ring: var(--color-sky-300);
+
+	/* common (base is bg and -fg suffix is legible contrast foreground) */
+	--color-P-card: var(--color-P-bg);
+	--color-P-card-fg: var(--color-P-fg);
+	--color-P-muted: var(--color-neutral-200);
+	--color-P-muted-fg: var(--color-neutral-500);
+	--color-P-accent: var(--color-neutral-200);
+	--color-P-accent-fg: var(--color-neutral-900);
+
+	/* inline code (see astro config for shiki theme) */
+	--color-P-code: var(--color-neutral-200);
+	--color-P-code-fg: var(--color-neutral-900);
+}
+
+:root {
+	--P-white: oklch(1 0 0);
+	--P-black: oklch(0 0 0);
+}

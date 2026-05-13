@@ -1,0 +1,133 @@
+---
+import '@/styles/global.css'
+import { ClientRouter } from 'astro:transitions'
+import { Font } from 'astro:assets'
+import { DEFAULT_LOCALE, LAYOUT_NAV_LINKS } from '@/constants'
+import { cn } from '@/lib/style'
+import { SITE_BRAND_NAME } from '@/constants'
+import type { SeoMeta, SeoMetaType } from '@/seo.types'
+import HeadSeoMeta from '@/components/HeadSeoMeta.astro'
+import { ensureTrailingSlash } from '@/lib/slashes'
+import Logo from '@/components/Logo.astro'
+
+type Props = {
+	variant?: 'page' | 'post' | 'layout' | 'full'
+	meta?: SeoMeta<SeoMetaType> | undefined
+	mainClass?: string | undefined
+	containerClass?: string | undefined
+}
+
+const isCurrentPathname = (href: string): boolean => {
+	const currentPath = ensureTrailingSlash(Astro.url.pathname)
+	const linkPath = ensureTrailingSlash(href)
+	return currentPath === linkPath
+}
+
+const isActivePathname = (href: string): boolean => {
+	const currentPath = ensureTrailingSlash(Astro.url.pathname)
+	const linkPath = ensureTrailingSlash(href)
+	return currentPath === linkPath || currentPath.startsWith(linkPath)
+}
+
+const { variant = 'page', meta, mainClass: mainClassName, containerClass: containerClassName } = Astro.props as Props
+
+const canonicalUrl =
+	meta?.type === 'blog' && meta.canonicalUrl
+		? new URL(meta.canonicalUrl) // absolute URL is expected and passed through
+		: new URL(ensureTrailingSlash(Astro.url.pathname), Astro.site)
+
+const locale = new Intl.Locale(Astro.currentLocale || DEFAULT_LOCALE)
+const dir = locale.getTextInfo().direction
+
+const containerPaddingClassName = cn('px-4 py-8 sm:py-12 md:py-16')
+---
+
+<!doctype html>
+<html lang={DEFAULT_LOCALE} dir={dir}>
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width" />
+		<meta name="generator" content={Astro.generator} />
+
+		{typeof meta?.robots === 'string' && <meta name="robots" content={meta.robots} />}
+
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="icon" href="/favicon.ico" />
+
+		<link rel="canonical" href={canonicalUrl} />
+		<link rel="sitemap" href="/sitemap-index.xml" />
+
+		<Font cssVariable="--font-atkinson-next" preload />
+		<Font cssVariable="--font-atkinson-mono" preload />
+
+		<HeadSeoMeta canonicalUrl={canonicalUrl} meta={meta} />
+		<ClientRouter />
+	</head>
+	<body class="flex flex-col min-h-dvh antialiased bg-P-bg text-P-fg">
+		<header class="flex items-center min-h-(--layout-header-height) border-b border-P-border text-lg">
+			<nav
+				class="flex flex-wrap items-center justify-between gap-4 sm:gap-6 max-w-(--layout-max-width) mx-auto w-full px-4 py-4"
+			>
+				<a href="/" class="nav-home" aria-current={isCurrentPathname('/') ? 'page' : undefined}
+					><Logo class="h-6 w-auto" /></a
+				>
+				<ul class="flex gap-6">
+					{
+						LAYOUT_NAV_LINKS.map((link) => (
+							<li>
+								<a
+									href={link.href}
+									class="nav-link"
+									data-active={isActivePathname(link.href) ? 'true' : undefined}
+									aria-current={isCurrentPathname(link.href) ? 'page' : undefined}
+								>
+									{link.label}
+								</a>
+							</li>
+						))
+					}
+				</ul>
+			</nav>
+		</header>
+		<main id="main" class={cn('flex-1 text-lg', mainClassName)}>
+			{
+				variant === 'post' ? (
+					<article class={cn('prose mx-auto w-full max-w-prose', containerPaddingClassName, containerClassName)}>
+						<slot />
+					</article>
+				) : variant === 'page' ? (
+					<div class={cn('mx-auto w-full max-w-prose', containerPaddingClassName, containerClassName)}>
+						<slot />
+					</div>
+				) : variant === 'layout' ? (
+					<div class={cn('mx-auto w-full max-w-(--layout-max-width)', containerPaddingClassName, containerClassName)}>
+						<slot />
+					</div>
+				) : (
+					<slot />
+				)
+			}
+		</main>
+		<footer class="h-(--layout-footer-height) border-t border-P-border text-lg text-P-heading">
+			<div class="mx-auto w-full max-w-(--layout-max-width) px-4 py-4 text-center font-semibold">
+				© {SITE_BRAND_NAME}
+			</div>
+		</footer>
+	</body>
+</html>
+
+<style>
+	@reference "@/styles/global.css";
+
+	.nav-home {
+		@apply block font-semibold px-2 -mx-2 text-P-heading transition-colors;
+		@apply hover:rounded-sm hover:bg-P-muted hover:text-P-link;
+	}
+
+	a.nav-link {
+		@apply block font-semibold rounded-sm px-2 -mx-2 py-1.5 -my-1.5 transition-[color,text-decoration-thickness];
+		@apply text-P-link hover:text-P-link-hover;
+		@apply underline-offset-2 decoration-current decoration-[1.5px];
+		@apply hover:underline data-active:underline;
+	}
+</style>

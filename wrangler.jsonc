@@ -1,0 +1,38 @@
+{
+	"name": "cognitive-shift-project",
+	"main": "@astrojs/cloudflare/entrypoints/server",
+	"send_metrics": false,
+	"compatibility_date": "2026-04-17",
+	"compatibility_flags": ["nodejs_compat", "nodejs_compat_populate_process_env", "global_fetch_strictly_public"],
+	"upload_source_maps": true,
+	"assets": {
+		"directory": "./dist",
+		"binding": "ASSETS",
+		"not_found_handling": "404-page",
+		"html_handling": "auto-trailing-slash",
+		"run_worker_first": [
+			"/og.png",
+			"/blog/*/og.png",
+			"/_image*", // astro image optimization service
+			"/_actions/*", // astro actions post endpoints
+			"/_server-islands/*" // astro server islands
+		]
+	},
+	"observability": {
+		"enabled": true
+	},
+	"vars": {
+		"ENVIRONMENT": "production",
+		"VALUE_FROM_CLOUDFLARE": "Hello from Cloudflare (Production)",
+		"FLAG_ROBOTS_TXT": "true"
+	},
+	"env": {
+		"preview": {
+			"vars": {
+				"ENVIRONMENT": "preview",
+				"VALUE_FROM_CLOUDFLARE": "Hello from Cloudflare (Preview)",
+				"FLAG_ROBOTS_TXT": "false"
+			}
+		}
+	}
+}

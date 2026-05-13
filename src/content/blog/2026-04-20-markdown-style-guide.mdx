@@ -1,0 +1,259 @@
+---
+title: Markdown Style Guide
+description: Demonstration of Markdown syntax and styling when writing content.
+publishedAt: 2026-04-20
+---
+
+This post contains examples of Markdown syntax that can be used when writing content in Astro.
+
+## Headings & Paragraphs
+
+In HTML the `<h1>`—`<h6>` elements represent six hierarchical levels of headings: `<h1>` is the highest level and `<h6>` is the lowest.
+
+You should only use `<h2>`—`<h6>` in your content because `<h1>` is reserved for the title of the post. This theme's post layout takes care of rendering the post title.
+
+For most types of content is best to limit heading levels to `<h2>` and `<h3>` for clarity and accessibility.
+
+This section begins with `<h2>`. Below are examples of the remaining heading levels along with dummy content that demonstrates different formatting options.
+
+### H3
+
+Example paragraph under heading level 3 showing **bold**, _italics_, `inline code`, and a [link](https://google.com).
+
+Quiatem. Nam, omnis sum am facea corem alique molestrunt et eos evelece arcillit ut aut eos eos nus, sin conecerem erum fuga.
+
+#### H4
+
+Example paragraph under heading level 4 showing **bold**, _italics_, `inline code`, and a [link](https://google.com).
+
+Nunc sed feugiat massa. Proin vel lorem eu augue hendrerit facilisis et nec mi.
+
+##### H5
+
+Example paragraph under heading level 5 showing **bold**, _italics_, `inline code`, and a [link](https://google.com).
+
+Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.
+
+###### H6
+
+Example paragraph under heading level 6 showing **bold**, _italics_, `inline code`, and a [link](https://google.com).
+
+Curabitur dignissim elit sed nisi faucibus, sit amet aliquam dolor pretium.
+
+## Images
+
+### Syntax
+
+Reference images under `public/` using full or relative path.
+
+Reference images under Astro's `assets/` directory using relative path or TypeScript path alias.
+
+```markdown
+![Alt text](./full/or/relative/path/to/image)
+
+![blog placeholder image](@/assets/placeholder.png)
+```
+
+### Output
+
+![blog placeholder image](@/assets/placeholder.png)
+
+## Blockquotes
+
+A blockquote represents content quoted from another source, optionally with a citation which must be within a `footer` or `cite` element, and optionally with inline changes such as annotations and abbreviations.
+
+### Blockquote without attribution
+
+#### Syntax
+
+```markdown
+> Tiam, ad mint andaepu dandae nostion secatur sequo quae.
+> **Note** that you can use _Markdown syntax_ within a blockquote.
+```
+
+#### Output
+
+> Tiam, ad mint andaepu dandae nostion secatur sequo quae.
+> **Note** that you can use _Markdown syntax_ within a blockquote.
+
+### Blockquote with attribution
+
+#### Syntax
+
+```markdown
+> Don't communicate by sharing memory, share memory by communicating.<br />
+> — <cite>Rob Pike[^1]</cite>
+```
+
+#### Output
+
+> Don't communicate by sharing memory, share memory by communicating.<br />
+> — <cite>Rob Pike[^1]</cite>
+
+[^1]: The above quote is excerpted from Rob Pike's [talk](https://www.youtube.com/watch?v=PAAkCSZUG1c) during Gopherfest, November 18, 2015.
+
+## Tables
+
+### Syntax
+
+A small three-column table:
+
+```markdown
+| Italics   | Bold     | Code   |
+| --------- | -------- | ------ |
+| _italics_ | **bold** | `code` |
+```
+
+A larger table intended to demonstrate styling for horizontal scrolling on mobile viewports:
+
+```markdown
+| Fruit        | Origin           | Season       | Color           | Avg. weight | Calories (per 100g) | Common uses                       |
+| ------------ | ---------------- | ------------ | --------------- | ----------- | ------------------- | --------------------------------- |
+| Apple        | Central Asia     | Late summer  | Red, green      | 180 g       | 52                  | Fresh, baking, cider              |
+| Mango        | South Asia       | Spring       | Yellow, orange  | 300 g       | 60                  | Fresh, chutney, smoothies         |
+| Pineapple    | South America    | Year-round   | Golden          | 1,200 g     | 50                  | Fresh, grilling, juice            |
+| Strawberry   | Europe, Americas | Late spring  | Bright red      | 18 g        | 32                  | Fresh, jam, desserts              |
+| Blueberry    | North America    | Summer       | Deep blue       | 1.5 g       | 57                  | Fresh, baking, preserves          |
+| Pomegranate  | Middle East      | Autumn       | Crimson         | 280 g       | 83                  | Fresh, juice, garnish             |
+```
+
+### Output
+
+The smaller table:
+
+| Italics   | Bold     | Code   |
+| --------- | -------- | ------ |
+| _italics_ | **bold** | `code` |
+
+The larger table:
+
+| Fruit        | Origin           | Season       | Color           | Avg. weight | Calories (per 100g) | Common uses                       |
+| ------------ | ---------------- | ------------ | --------------- | ----------- | ------------------- | --------------------------------- |
+| Apple        | Central Asia     | Late summer  | Red, green      | 180 g       | 52                  | Fresh, baking, cider              |
+| Mango        | South Asia       | Spring       | Yellow, orange  | 300 g       | 60                  | Fresh, chutney, smoothies         |
+| Pineapple    | South America    | Year-round   | Golden          | 1,200 g     | 50                  | Fresh, grilling, juice            |
+| Strawberry   | Europe, Americas | Late spring  | Bright red      | 18 g        | 32                  | Fresh, jam, desserts              |
+| Blueberry    | North America    | Summer       | Deep blue       | 1.5 g       | 57                  | Fresh, baking, preserves          |
+| Pomegranate  | Middle East      | Autumn       | Crimson         | 280 g       | 83                  | Fresh, juice, garnish             |
+
+## Code Blocks
+
+### Syntax
+
+we can use 3 backticks ``` in new line and write snippet and close with 3 backticks on new line and to highlight language specific syntax, write one word of language name after first 3 backticks, for eg. html, javascript, css, markdown, typescript, txt, bash
+
+````markdown
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Example HTML5 Document</title>
+  </head>
+  <body>
+    <p>Test</p>
+  </body>
+</html>
+```
+````
+
+### Output
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Example HTML5 Document</title>
+  </head>
+  <body>
+    <p>Test</p>
+  </body>
+</html>
+```
+
+## List Types
+
+### Ordered List
+
+#### Syntax
+
+```markdown
+1. First item
+2. Second item
+3. Third item
+```
+
+#### Output
+
+1. First item
+2. Second item
+3. Third item
+
+### Unordered List
+
+#### Syntax
+
+```markdown
+- List item
+- Another item
+- And another item
+```
+
+#### Output
+
+- List item
+- Another item
+- And another item
+
+### Nested list
+
+#### Syntax
+
+```markdown
+- Fruit
+  - Apple
+  - Orange
+  - Banana
+- Dairy
+  - Milk
+  - Cheese
+```
+
+#### Output
+
+- Fruit
+  - Apple
+  - Orange
+  - Banana
+- Dairy
+  - Milk
+  - Cheese
+
+## Other Elements — `abbr`, `sub`, `sup`, `kbd`, `mark`
+
+### Syntax
+
+```markdown
+<abbr title="Graphics Interchange Format">GIF</abbr> is a bitmap image format.
+
+H<sub>2</sub>O
+
+X<sup>n</sup> + Y<sup>n</sup> = Z<sup>n</sup>
+
+Press <kbd>CTRL</kbd> + <kbd>ALT</kbd> + <kbd>Delete</kbd> to end the session.
+
+Most <mark>salamanders</mark> are nocturnal, and hunt for insects, worms, and other small creatures.
+```
+
+### Output
+
+<abbr title="Graphics Interchange Format">GIF</abbr> is a bitmap image format.
+
+H<sub>2</sub>O
+
+X<sup>n</sup> + Y<sup>n</sup> = Z<sup>n</sup>
+
+Press <kbd>CTRL</kbd> + <kbd>ALT</kbd> + <kbd>Delete</kbd> to end the session.
+
+Most <mark>salamanders</mark> are nocturnal, and hunt for insects, worms, and other small creatures.

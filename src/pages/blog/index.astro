@@ -1,0 +1,51 @@
+---
+import { getCollection } from 'astro:content'
+import Layout from '@/layouts/Layout.astro'
+import FormattedDate from '@/components/FormattedDate.astro'
+import { cn } from '@/lib/style'
+
+const currentDate = new Date()
+const posts = (await getCollection('blog', ({ data }) => !data.draft && data.publishedAt <= currentDate)).sort(
+	(a, b) => b.data.publishedAt.valueOf() - a.data.publishedAt.valueOf(),
+)
+
+const title = 'Blog Posts'
+---
+
+<Layout
+	meta={{
+		type: 'page',
+		title,
+		description: 'Explore the latest from our blog.',
+	}}
+>
+	<section>
+		<hgroup class="mb-8 sm:mb-12">
+			<h1 class="text-h1 text-P-heading text-balance mb-4">{title}</h1>
+			<div class="text-lead text-P-lead text-pretty">
+				<p>Example blog content collection with MDX.</p>
+			</div>
+		</hgroup>
+		<ul class="space-y-6">
+			{
+				posts.map((post) => (
+					<li>
+						<a href={`/blog/${post.id}/`} class="group block">
+							<h2
+								class={cn(
+									'text-xl font-semibold transition-[color,text-decoration-thickness]',
+									'underline underline-offset-2 decoration-current decoration-1 hover:decoration-[1.5px]',
+									'text-P-link group-hover:text-P-link-hover',
+								)}
+							>
+								{post.data.title}
+							</h2>
+							<FormattedDate class="text-sm text-P-subtle" date={post.data.publishedAt} />
+							{post.data.description && <p class="mt-1 text-P-lead">{post.data.description}</p>}
+						</a>
+					</li>
+				))
+			}
+		</ul>
+	</section>
+</Layout>

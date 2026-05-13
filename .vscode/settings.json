@@ -1,0 +1,110 @@
+{
+	// use project version of typescript in vscode
+	"js/ts.tsdk.path": "node_modules/typescript/lib",
+	"js/ts.tsdk.promptToUseWorkspaceVersion": true,
+	"js/ts.preferences.preferTypeOnlyAutoImports": true,
+	"js/ts.preferences.autoImportSpecifierExcludeRegexes": ["node_modules"],
+	"js/ts.preferences.importModuleSpecifier": "non-relative",
+
+	// remember to choose astro use workspace version in command palette
+	// astro vscode extension still references the deprecated vscode settings so these are required until it's fixed
+	"typescript.tsdk": "node_modules/typescript/lib",
+	"typescript.preferences.importModuleSpecifier": "non-relative",
+
+	// ensure vscode uses pnpm vs. npm
+	"npm.packageManager": "pnpm",
+
+	// ensure these align with tailwind configuration for intellisense to compute correct values
+	"tailwindCSS.rootFontSize": 16,
+	"tailwindCSS.codeActions": true,
+	"tailwindCSS.classFunctions": ["clsx", "cva", "cn", "cx"],
+
+	// ensure eslint and prettier are disabled to avoid conflicts with biome
+	"eslint.enable": false,
+	"prettier.enable": false,
+
+	// biome and editor configuration
+	"editor.defaultFormatter": "biomejs.biome",
+	"editor.trimAutoWhitespace": true,
+	"editor.insertSpaces": false,
+	"editor.renderWhitespace": "all",
+	"editor.tabCompletion": "on",
+	"editor.tabSize": 2,
+	"editor.detectIndentation": false,
+
+	// biome code actions on save
+	"editor.codeActionsOnSave": {
+		"source.fixAll.biome": "explicit",
+		"source.organizeImports": "never",
+		"source.organizeImports.biome": "explicit"
+	},
+
+	// ensure intellisense autocomplete for tailwind classes
+	"editor.quickSuggestions": {
+		"strings": "on"
+	},
+
+	// editor automatic formatting
+	"editor.formatOnPaste": false,
+	"editor.formatOnSave": true,
+	"editor.formatOnType": false,
+
+	// editor guides for legibility
+	"editor.guides.bracketPairs": true,
+	"editor.guides.highlightActiveIndentation": true,
+	"editor.guides.indentation": true,
+	"editor.guides.bracketPairsHorizontal": "active",
+
+	// exclude lockfile content from search results
+	"search.exclude": {
+		"pnpm-lock.yaml": true,
+		"**/node_modules/*": true
+	},
+
+	"files.associations": {
+		"*.css": "tailwindcss",
+		"*.js": "javascript",
+		"*.jsx": "javascriptreact",
+		"*.json": "json",
+		"*.ts": "typescript",
+		"*.tsx": "typescriptreact",
+		"*.yml": "yaml",
+		"*.yaml": "yaml",
+		"tsconfig.json": "jsonc",
+		"tsconfig.*.json": "jsonc"
+	},
+	"files.trimFinalNewlines": true,
+	"files.trimTrailingWhitespace": true,
+	"files.trimTrailingWhitespaceInRegexAndStrings": true,
+
+	"[astro]": {
+		// biome's astro support is currently too buggy to be useful so we defer to vscode extension
+		// "editor.defaultFormatter": "biomejs.biome"
+
+		"editor.defaultFormatter": "astro-build.astro-vscode"
+	},
+	"[css]": {
+		"editor.defaultFormatter": "biomejs.biome"
+	},
+	"[javascript]": {
+		"editor.defaultFormatter": "biomejs.biome"
+	},
+	"[javascriptreact]": {
+		"editor.defaultFormatter": "biomejs.biome"
+	},
+	"[json]": {
+		"editor.defaultFormatter": "biomejs.biome"
+	},
+	"[jsonc]": {
+		"editor.defaultFormatter": "biomejs.biome"
+	},
+	"[typescript]": {
+		"editor.defaultFormatter": "biomejs.biome"
+	},
+	"[typescriptreact]": {
+		"editor.defaultFormatter": "biomejs.biome"
+	},
+	"[yaml]": {
+		"editor.defaultFormatter": "redhat.vscode-yaml"
+	}
+}
