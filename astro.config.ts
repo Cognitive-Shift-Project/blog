@@ -7,7 +7,7 @@ import tailwindcss from '@tailwindcss/vite'
 
 import { rehypeWrapTables } from './plugins/rehype/rehype-wrap-tables'
 
-const DEPLOY_DOMAIN = 'astroflare-og-public.bitcurve.workers.dev'
+const DEPLOY_DOMAIN = 'cognitive-shift-project.raphael-gabbay.workers.dev'
 const ASTRO_SITE = (
 	process.env.NODE_ENV === 'production' ? `https://${DEPLOY_DOMAIN}` : 'http://localhost:4321'
 ) satisfies AstroUserConfig['site']
