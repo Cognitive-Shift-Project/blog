@@ -9,21 +9,21 @@ const posts = (await getCollection('blog', ({ data }) => !data.draft && data.pub
 	(a, b) => b.data.publishedAt.valueOf() - a.data.publishedAt.valueOf(),
 )
 
-const title = 'Blog Posts'
+const title = 'Blog'
 ---
 
 <Layout
 	meta={{
 		type: 'page',
 		title,
-		description: 'Explore the latest from our blog.',
+		description: 'Analyses, paper reviews, and experiment logs from the Cognitive Shift Project collective.',
 	}}
 >
 	<section>
 		<hgroup class="mb-8 sm:mb-12">
 			<h1 class="text-h1 text-P-heading text-balance mb-4">{title}</h1>
 			<div class="text-lead text-P-lead text-pretty">
-				<p>Example blog content collection with MDX.</p>
+				<p>Analyses, paper reviews, and experiment logs from the collective.</p>
 			</div>
 		</hgroup>
 		<ul class="space-y-6">

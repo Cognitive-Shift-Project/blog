@@ -16,7 +16,8 @@
     "typegen": "wrangler types",
     "typecheck": "pnpm typegen && tsc --project tsconfig.json --noEmit --pretty && astro check",
     "check": "biome check && prettier --check \"**/*.astro\" && astro check",
-    "check:fix": "biome check --write && prettier --write \"**/*.astro\" && astro check"
+    "check:fix": "biome check --write && prettier --write \"**/*.astro\" && astro check",
+    "new:post": "node scripts/new-post.mjs"
   },
   "overrides": {
     "vite": "^7"

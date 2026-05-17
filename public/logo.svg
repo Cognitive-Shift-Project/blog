@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.5">
+  <title>Cognitive Shift Project</title>
+  <!-- outer ring -->
+  <circle cx="32" cy="32" r="29"/>
+  <!-- upper-left lobe -->
+  <ellipse cx="24" cy="22" rx="17" ry="10" transform="rotate(-40 24 22)"/>
+  <!-- lower-right lobe -->
+  <ellipse cx="40" cy="42" rx="17" ry="10" transform="rotate(-40 40 42)"/>
+</svg>
