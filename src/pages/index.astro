@@ -1,5 +1,4 @@
 ---
-import HomeFeatures from '@/components/HomeFeatures.astro'
 import HomeIntro from '@/components/HomeIntro.astro'
 import { SITE_BRAND_NAME } from '@/constants'
 import Layout from '@/layouts/Layout.astro'
@@ -9,18 +8,21 @@ import Layout from '@/layouts/Layout.astro'
 	meta={{
 		type: 'page',
 		title: SITE_BRAND_NAME,
-		description:
-			'Live demo of the AstroFlareOG starter theme for Astro on Cloudflare Workers with dynamic Open Graph image generation. Open source by @firxworx.',
+		description: 'A collective exploring post-LLM AI: cognitive architectures, world models, and autonomous agents.',
 	}}
 >
 	<section>
 		<header class="mb-12">
 			<h1 class="text-h1 text-P-heading text-balance mb-4">{SITE_BRAND_NAME}</h1>
 			<div class="text-lead text-P-lead text-pretty">
-				<p>Notes from a collective of cognitive scientists and AI researchers.</p>
+				<p>Most of the industry is optimizing LLMs. We think the real discontinuity comes from somewhere else.</p>
+				<p>
+					Cognitive Shift is a collective of researchers and builders tracking the shift toward cognitive AI systems —
+					architectures that reason, plan, and model the world rather than predict the next token.
+				</p>
 			</div>
 		</header>
-		<h2 class="text-h2 mt-[1.75em] mb-[0.615em] text-center">About the Project</h2>
+		<h2 class="text-h2 mt-[1.75em] mb-[0.615em] text-center">Our thesis</h2>
 		<HomeIntro />
 	</section>
 </Layout>

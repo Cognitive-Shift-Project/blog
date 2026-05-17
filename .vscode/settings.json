@@ -106,5 +106,9 @@
 	},
 	"[yaml]": {
 		"editor.defaultFormatter": "redhat.vscode-yaml"
+	},
+	"chat.tools.terminal.autoApprove": {
+		"ForEach-Object": true,
+		"Out-File": true
 	}
 }

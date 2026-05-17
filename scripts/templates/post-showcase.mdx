@@ -1,0 +1,33 @@
+---
+title: {{TITLE}}
+{{DESCRIPTION_LINE}}publishedAt: {{PUBLISHED_AT}}
+{{DRAFT_LINE}}---
+
+import Callout from '@/components/ui/Callout.astro';
+import LinkCard from '@/components/ui/LinkCard.astro';
+import Steps from '@/components/ui/Steps.astro';
+import Divider from '@/components/ui/Divider.astro';
+
+Open with a hook — one or two sentences that tell the reader what they will get out of this post.
+
+<Callout type="tip" title="Heads up">
+Use callouts to highlight context the reader should not miss.
+</Callout>
+
+## Getting started
+
+<Steps>
+1. Outline the problem you are solving.
+2. Walk through the solution step by step.
+3. Wrap up with a summary or next action.
+</Steps>
+
+<Divider />
+
+## Go deeper
+
+<LinkCard
+  title="Related reading"
+  description="Point the reader at a useful next stop."
+  href="https://example.com"
+/>

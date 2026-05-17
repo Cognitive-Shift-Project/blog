@@ -1,0 +1,130 @@
+---
+title: "How we built this blog with AI — from blank repo to Cloudflare"
+description: "A first-hand account of designing and shipping a Cloudflare-hosted Astro blog almost entirely through conversations with IDE agents: Cursor, VS Code Copilot, and Claude."
+publishedAt: 2026-05-17
+---
+
+import Callout from '@/components/ui/Callout.astro';
+import Steps from '@/components/ui/Steps.astro';
+import ProsCons from '@/components/ui/ProsCons.astro';
+import LinkCard from '@/components/ui/LinkCard.astro';
+
+## Why we needed a blog
+
+The Cognitive Shift Project is organized around a thesis that most people haven't articulated yet: the real discontinuity in AI won't come from better chat models. It will come from systems that can reason over time, maintain persistent world models, plan across long horizons, and act autonomously in complex environments. Cognitive architectures, hyper agents, world models — these ideas exist in the research literature and in a small cluster of labs, but they haven't found a public home yet.
+
+We needed a place to publish. Not a newsletter, not a social thread — a proper publication where we can post long-form analyses, document experiments, reference earlier work, and invite contributors to add their own. Something with code-first tooling, versioned content, and no dependency on a platform we don't control.
+
+Beyond the writing surface, the blog is infrastructure for a community. The people who should be reading this work are the ones who already suspect that GPT-4-class conversational AI is a stepping stone, not the destination. We want to find them, and give them something worth bookmarking.
+
+That meant building fast, building right, and making contribution easy from day one.
+
+## Picking the stack
+
+The requirements were straightforward: fast global delivery, zero server maintenance, full ownership of the codebase, and a good experience for MDX-heavy technical writing. Component-rich posts — callouts, code blocks, comparison tables — need a framework that treats MDX as a first-class citizen, not an afterthought.
+
+We chose **Astro v6** with the **`@astrojs/cloudflare` adapter**, deployed as a Cloudflare Worker. Astro's island architecture means the default output is static HTML; the Worker handles dynamic routes (OG image generation, in our case) without adding latency to the main content paths. MDX works natively. The content collection system gives us typed frontmatter and a clean separation between content and layout.
+
+What we didn't choose, and why:
+
+- **Next.js**: a heavier runtime, and its strengths are in app interactivity that a blog simply doesn't need. The React overhead is a tax we weren't willing to pay for static pages.
+- **Hugo**: fast and battle-tested, but MDX isn't in its vocabulary. When you want `<Tabs>` and `<Steps>` inside a post, a Go template system isn't the right abstraction.
+- **Ghost / Substack**: we'd be tenants. No raw MDX, no custom components, no ownership of the rendering pipeline.
+
+We built on the **AstroFlareOG** starter by Kevin Firko ([@firxworx](https://github.com/firxworx)), which solved the hardest part upfront: dynamic Open Graph image generation that actually works on Cloudflare's `workerd` runtime.
+
+<Callout type="note">
+**Credit where it's due.** The OG image pipeline uses [cf-workers-og](https://github.com/jillesme/cf-workers-og) by Jilles Soeters, which wraps `satori` (JSX-to-SVG) and `resvg` (SVG-to-PNG) without Puppeteer. Kevin's AstroFlareOG starter wired this into Astro cleanly and handled the `workerd`-specific constraints. We built on top of both — thank you.
+</Callout>
+
+## The agent-first build process
+
+This is where it gets interesting, and also where we want to be honest rather than promotional.
+
+We used **VS Code with GitHub Copilot in agent mode**, backed by Claude Sonnet as the primary model. The workflow wasn't blank-slate generation — we started from an existing starter theme, so the job was adaptation and extension, not invention from nothing. That distinction matters. Agents are better at transforming a concrete starting point than they are at making aesthetic decisions from scratch.
+
+The agent handled the structural work well: updating the content collection schema to match our frontmatter shape, building out the palette token system in CSS custom properties, writing the `.prose` utility with `:where()` selectors so components could opt out cleanly with `not-prose`, and scaffolding the MDX component shells. These are tasks with clear specifications and verifiable outputs.
+
+Our prompting style throughout was "describe intent, let it implement, validate." Rather than specifying implementation details, we described the desired outcome: *"the post layout should use `article > max-w-prose`, the list page variant should use `layout-max-width`"*. The agent would implement, we'd run `astro check`, and any type errors came back immediately — usually in the same response turn. Astro's TypeScript strictness turned out to be one of the most useful tools in the loop. It's not just a correctness check; it's a communication channel between the agent's output and our expectations.
+
+The planning layer was equally important. We maintained a structured list of build phases — collection schema, layout system, design tokens, MDX components, OG image routes — and kept the agent scoped to one phase at a time. Without that structure, agent sessions drift. You ask for a button style and come back to find the layout rewritten. Decomposition prevents that.
+
+Where it didn't work perfectly: CSS specificity edge cases occasionally required a manual pass. The `:where()` selectors in the prose utility interacted unexpectedly with some component styles, and the fix needed a human to read the cascade and reason about it directly. The agent also produced one over-engineered abstraction early on — a content transformation layer that was trying to solve a problem we didn't have — which we simplified back to a direct import. Both are recoverable, but they're worth naming.
+
+## The OG image rabbit hole
+
+Dynamic Open Graph images are table stakes for a technical blog in 2026. Every post shared on social should render a proper preview. The challenge is doing this on Cloudflare's `workerd` runtime, which has a different execution model from Node.js.
+
+`workerd` has strict restrictions on WebAssembly module loading. The libraries involved — `satori` for rendering JSX to SVG, and `resvg` for converting SVG to PNG — both use WASM internally. Loading them the standard way fails immediately.
+
+The other gotcha was fonts. `satori` doesn't support WOFF2 variable fonts, which is what most modern type stacks use. We had to ship static non-variable `.woff` files in `public/fonts/` and load them as binary data at request time. This is less elegant than a font CDN, but it's reliable and keeps the OG images consistent regardless of network conditions at render time.
+
+The OG templates themselves are JSX-as-strings passed to `cf-workers-og`'s `ImageResponse.create()`. They're not React components — no hooks, no reactivity, just an HTML-like string template that `satori` knows how to walk. Once you accept that mental model, the templates are straightforward to write and iterate on.
+
+<Callout type="tip">
+If you're hitting `TypeError: WebAssembly.instantiate` on workerd, check that your `wrangler.jsonc` has `assets.run_worker_first` patterns covering your OG routes — otherwise Cloudflare serves the asset from the CDN layer and the Worker never runs.
+</Callout>
+
+## Building the design system
+
+The MDX components — `Callout`, `Tabs`, `Steps`, `LinkCard`, `ProsCons`, and a handful of others — exist for a specific reason: technical writing has recurring patterns that plain Markdown handles badly. A warning that looks like body copy gets ignored. A numbered procedure that lives in a `<ul>` loses its sequence. A comparison that's laid out in prose instead of columns forces the reader to do the comparison mentally.
+
+Components give the author a vocabulary. The question was what that vocabulary should be and how it should behave.
+
+Our design principle was explicit over implicit. Every component gets imported at the top of the file. There's no global component registry, no auto-import magic. If you use `<Callout>`, it appears in your imports. This makes posts easier to reason about and refactor — you can see what a file depends on without searching the codebase.
+
+The prose utility uses `:where()` selectors throughout, which keeps specificity low and lets any component override prose styles by adding a `not-prose` class. This means the design system and the content layer don't fight each other.
+
+The typical authoring workflow looks like this:
+
+<Steps>
+  <div>
+    ### Start a new post
+    Run `pnpm new:post` — the interactive script scaffolds the frontmatter with the correct date and slug format, and opens the file in your editor.
+  </div>
+  <div>
+    ### Write in MDX
+    Astro's dev server hot-reloads on every save. Import the components you need at the top of the file. The TypeScript types on each component's props surface errors in your editor before you ever run a build.
+  </div>
+  <div>
+    ### Run preflight
+    Run `pnpm preflight` (typecheck + build) before pushing. This catches any MDX prop mismatches, missing imports, or collection schema violations.
+  </div>
+  <div>
+    ### Open a PR
+    See CONTRIBUTING.md for the full checklist. The PR template covers frontmatter validation, image alt text, and link checks.
+  </div>
+</Steps>
+
+## What worked, what didn't
+
+The honest summary, six weeks in:
+
+<ProsCons
+  pros={[
+    "Describe-then-verify prompting: tell the agent the intent, let it implement, run astro check to validate. The tight feedback loop made correctness cheap and kept sessions focused.",
+    "Breaking the build into named phases with a planning agent. Avoiding big-bang sessions meant we always had a working baseline to return to.",
+    "Astro's TypeScript strictness as a correctness net. Type errors surfaced agent mistakes immediately — often within the same response turn — rather than at deploy time."
+  ]}
+  cons={[
+    "Asking for holistic design decisions without a brief produced mediocre output. 'Make it look nice' doesn't give the agent enough constraint. 'Neutral palette, sky accent, legible at text-lg base' works.",
+    "Long multi-file edits in a single prompt were fragile. Better to decompose — one file, one concern — and verify each piece before moving to the next.",
+    "The agent occasionally introduced abstractions for problems we didn't have. Spotting and removing those required a human review pass that took longer than a clean implementation would have."
+  ]}
+/>
+
+The pattern we'd recommend to anyone starting a similar project: keep the agent scoped, keep the feedback loop short, and treat the type system as your integration test suite.
+
+## What's next
+
+The blog is infrastructure, not the destination. Publishing the build process is also a kind of thesis statement: we think this is how serious technical projects will be built for the next several years, and we wanted to document it from the beginning.
+
+The work ahead is the reason the project exists. We're planning a cognitive architectures primer — a practical map of the design space between today's transformer-based systems and the kinds of agents that can model their environment and plan across long time horizons. We're working through a survey of world model papers, starting with Yann LeCun's work on Joint Embedding Predictive Architectures and what it implies for autonomous systems. And we'll be running our own experiments with autonomous coding agents, with an eye toward understanding where the planning and reasoning breakdowns actually occur in practice.
+
+The real discontinuity in AI is still ahead. We're building the publication layer for the people who think so too.
+
+<LinkCard
+  href="https://github.com/Cognitive-Shift-Project"
+  title="Contribute on GitHub"
+  description="The site is open-source. Read CONTRIBUTING.md to add a post."
+/>
