@@ -1,30 +1,22 @@
 ---
 import type { HTMLAttributes } from 'astro/types'
 import { cn } from '@/lib/style'
+import { LOGO_PATH_D } from '@/lib/og/og-logo-svg'
 
-/**
- * Cognitive Shift Project mark: outer ring with two interlocking oval lobes.
- * Sizes via CSS `h-` class; colors via `currentColor`.
- */
-interface Props extends Pick<HTMLAttributes<'svg'>, 'class'> {
-	color?: string
-	widthPx?: number
-	logoHeightPx?: number
-}
+interface Props extends Pick<HTMLAttributes<'span'>, 'class'> {}
 
 const { class: className } = Astro.props as Props
 ---
 
-<svg
-	xmlns="http://www.w3.org/2000/svg"
-	viewBox="0 0 64 64"
-	fill="none"
-	stroke="currentColor"
-	stroke-width="1.5"
-	class={cn('h-6 w-auto', className)}
->
-	<title>Cognitive Shift Project</title>
-	<circle cx="32" cy="32" r="29"></circle>
-	<ellipse cx="24" cy="22" rx="17" ry="10" transform="rotate(-40 24 22)"></ellipse>
-	<ellipse cx="40" cy="42" rx="17" ry="10" transform="rotate(-40 40 42)"></ellipse>
-</svg>
+<span class={cn('inline-flex items-center gap-2', className)}>
+	<svg
+		xmlns="http://www.w3.org/2000/svg"
+		viewBox="0 0 64 64"
+		fill="currentColor"
+		aria-hidden="true"
+		class="h-6 w-auto flex-none"
+	>
+		<path d={LOGO_PATH_D} fill-rule="evenodd"></path>
+	</svg>
+	<span>Cognitive Shift Project</span>
+</span>

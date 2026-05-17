@@ -1,9 +1,11 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.5">
-  <title>Cognitive Shift Project</title>
-  <!-- outer ring -->
-  <circle cx="32" cy="32" r="29"/>
-  <!-- upper-left lobe -->
-  <ellipse cx="24" cy="22" rx="17" ry="10" transform="rotate(-40 24 22)"/>
-  <!-- lower-right lobe -->
-  <ellipse cx="40" cy="42" rx="17" ry="10" transform="rotate(-40 40 42)"/>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="100%" height="100%" viewBox="0 0 64 64" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;">
+    <circle cx="32" cy="32" r="29" style="stroke:black;stroke-width:1.5px;"/>
+    <g transform="matrix(0.766044,-0.642788,0.642788,0.766044,-8.52639,20.5739)">
+        <ellipse cx="24" cy="22" rx="17" ry="10" style="fill:white;stroke:black;stroke-width:1.5px;"/>
+    </g>
+    <g transform="matrix(0.766044,-0.642788,0.642788,0.766044,-17.6389,35.5376)">
+        <ellipse cx="40" cy="42" rx="17" ry="10" style="fill:white;stroke:black;stroke-width:1.5px;"/>
+    </g>
 </svg>
