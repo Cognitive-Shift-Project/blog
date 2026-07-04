@@ -1,0 +1,35 @@
+---
+import { cn } from '@/lib/style'
+import type { HTMLAttributes } from 'astro/types'
+
+type Props = HTMLAttributes<'a'> & {
+	active?: boolean
+	affordance?: boolean
+	variant?: 'default' | 'nav' | 'plain'
+}
+
+const {
+	active = false,
+	affordance,
+	class: className,
+	variant = 'default',
+	...attrs
+} = Astro.props as Props
+
+const classes = cn(
+	'ds-link',
+	variant === 'default' && 'ds-link--underline',
+	variant === 'nav' && 'ds-link--nav',
+	variant === 'plain' && 'ds-link--plain',
+	className,
+)
+---
+
+<a
+	{...attrs}
+	class={classes}
+	data-active={active ? 'true' : undefined}
+	data-link-affordance={typeof affordance === 'boolean' ? String(affordance) : undefined}
+>
+	<slot />
+</a>

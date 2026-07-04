@@ -3,9 +3,11 @@ import type { HTMLAttributes } from 'astro/types'
 import { cn } from '@/lib/style'
 import { LOGO_PATH_D } from '@/lib/og/og-logo-svg'
 
-interface Props extends Pick<HTMLAttributes<'span'>, 'class'> {}
+interface Props extends Pick<HTMLAttributes<'span'>, 'class'> {
+	showText?: boolean
+}
 
-const { class: className } = Astro.props as Props
+const { class: className, showText = true } = Astro.props as Props
 ---
 
 <span class={cn('inline-flex items-center gap-2', className)}>
@@ -18,5 +20,5 @@ const { class: className } = Astro.props as Props
 	>
 		<path d={LOGO_PATH_D} fill-rule="evenodd"></path>
 	</svg>
-	<span>Cognitive Shift Project</span>
+	{showText && <span class="logo-label">Cognitive Shift Project</span>}
 </span>

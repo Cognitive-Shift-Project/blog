@@ -1,0 +1,9 @@
+---
+type Props = {
+	message: string
+}
+
+const { message } = Astro.props as Props
+---
+
+<p class="skills-empty" data-skills-empty hidden>{message}</p>

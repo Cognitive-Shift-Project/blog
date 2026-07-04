@@ -1,0 +1,48 @@
+---
+import { type CollectionEntry, render } from 'astro:content'
+import SkillsDetailLayout from '@/components/skills/layouts/SkillsDetailLayout.astro'
+import {
+	getPublishedSkillArticles,
+	getSkillArticleSlug,
+	getSkillContentKind,
+	getSkillFolderEntries,
+	normalizeSkillArticle,
+} from '@/lib/skills'
+
+type Props = {
+	article: CollectionEntry<'skills_articles'>
+}
+
+export async function getStaticPaths() {
+	const articles = await getPublishedSkillArticles()
+
+	return articles.flatMap((article) => {
+		const canonicalSlug = getSkillArticleSlug(article)
+		const paths = [
+			{
+				params: { slug: canonicalSlug },
+				props: { article },
+			},
+		]
+
+		if (canonicalSlug !== article.id) {
+			paths.push({
+				params: { slug: article.id },
+				props: { article },
+			})
+		}
+
+		return paths
+	})
+}
+
+const { article } = Astro.props as Props
+const normalizedArticle = normalizeSkillArticle(article)
+const contentKind = getSkillContentKind(article)
+const folderEntries = getSkillFolderEntries(normalizedArticle)
+const { Content } = await render(article)
+---
+
+<SkillsDetailLayout article={normalizedArticle} contentKind={contentKind} folderEntries={folderEntries}>
+	<Content />
+</SkillsDetailLayout>

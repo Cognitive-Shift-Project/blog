@@ -1,0 +1,37 @@
+---
+import '@/styles/skills.css'
+import SkillBackLink from '@/components/skills/atoms/SkillBackLink.astro'
+import SkillArticleSidebar from '@/components/skills/molecules/SkillArticleSidebar.astro'
+import SkillArticleViewer from '@/components/skills/molecules/SkillArticleViewer.astro'
+import Layout from '@/layouts/Layout.astro'
+import type { NormalizedSkillArticle, SkillContentKind, SkillFolderEntry } from '@/lib/skills'
+
+type Props = {
+	article: NormalizedSkillArticle
+	contentKind: SkillContentKind
+	folderEntries?: SkillFolderEntry[]
+}
+
+const { article, contentKind, folderEntries = [] } = Astro.props as Props
+---
+
+<Layout
+	variant="full"
+	meta={{
+		type: 'page',
+		title: article.name,
+		description: article.description,
+	}}
+>
+	<div class="skills-surface">
+		<main class="skills-article-shell">
+			<SkillBackLink href="/skills/" label="Back to articles" />
+			<article class="skills-article-layout" data-content-kind={contentKind}>
+				<SkillArticleViewer article={article} contentKind={contentKind} folderEntries={folderEntries}>
+					<slot />
+				</SkillArticleViewer>
+				<SkillArticleSidebar article={article} />
+			</article>
+		</main>
+	</div>
+</Layout>

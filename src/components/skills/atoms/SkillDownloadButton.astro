@@ -1,0 +1,16 @@
+---
+import { Download } from '@lucide/astro'
+
+type Props = {
+	href: string
+	label: string
+	variant?: 'button' | 'dot'
+}
+
+const { href, label, variant = 'button' } = Astro.props as Props
+const className = variant === 'dot' ? 'skills-download-dot' : 'skills-download-button'
+---
+
+<a class={className} href={href} download aria-label={label}>
+	{variant === 'dot' ? <Download size={10.5} stroke-width={2.6} aria-hidden="true" /> : <span>download</span>}
+</a>

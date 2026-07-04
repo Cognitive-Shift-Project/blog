@@ -1,0 +1,55 @@
+<script>
+	;(() => {
+		const skippedSelector = [
+			'.nav-home',
+			'.ds-link--nav',
+			'.nav-icon-button',
+			'.no-underline',
+			'.skills-cover-link',
+			'.skills-download-dot',
+			'.skills-download-button',
+			'.skills-open-button',
+			'.share-copy-button',
+			'[download]',
+			'[data-link-affordance="false"]',
+		].join(',')
+
+		const isHttpUrl = (url: URL) => url.protocol === 'http:' || url.protocol === 'https:'
+
+		const decorateLinks = (root = document) => {
+			for (const link of root.querySelectorAll<HTMLAnchorElement>('a[href]')) {
+				if (link.matches(skippedSelector)) continue
+				const href = link.getAttribute('href') ?? ''
+				if (!href || href.startsWith('#') || href.startsWith('mailto:') || href.startsWith('tel:')) continue
+
+				try {
+					const url = new URL(href, window.location.href)
+					if (!isHttpUrl(url)) continue
+
+					const kind = url.origin === window.location.origin ? 'internal' : 'external'
+					link.dataset.linkKind = kind
+					link.dataset.linkAffordance = 'true'
+
+					if (kind === 'external') {
+						link.rel = Array.from(new Set(`${link.rel} noopener noreferrer`.trim().split(/\s+/))).join(' ')
+					}
+				} catch {
+					// Ignore malformed hrefs; the browser will handle them as authored.
+				}
+			}
+		}
+
+		const globalState = window as Window & { __cognitiveShiftLinkAffordancesReady?: boolean }
+
+		if (!globalState.__cognitiveShiftLinkAffordancesReady) {
+			globalState.__cognitiveShiftLinkAffordancesReady = true
+
+			document.addEventListener('astro:page-load', () => decorateLinks())
+			document.addEventListener('astro:after-swap', () => {
+				decorateLinks()
+			})
+		}
+
+		decorateLinks()
+	})()
+</script>

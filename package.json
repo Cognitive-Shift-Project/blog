@@ -8,16 +8,20 @@
   "packageManager": "pnpm@11.1.1",
   "scripts": {
     "dev": "astro dev --port 4322",
+    "prebuild": "node scripts/skills-content-cli.cjs validate",
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "preflight": "pnpm typecheck && astro build",
+    "preflight": "pnpm typecheck && pnpm build",
     "deploy:worker": "pnpm build && cross-env WRANGLER_SEND_METRICS=false wrangler deploy",
     "typegen": "wrangler types",
     "typecheck": "pnpm typegen && tsc --project tsconfig.json --noEmit --pretty && astro check",
     "check": "biome check && prettier --check \"**/*.astro\" && astro check",
     "check:fix": "biome check --write && prettier --write \"**/*.astro\" && astro check",
-    "new:post": "node scripts/new-post.mjs"
+    "new:post": "node scripts/new-post.mjs",
+    "skills:content": "node scripts/skills-content-cli.cjs",
+    "skills:content:validate": "node scripts/skills-content-cli.cjs validate",
+    "skills:content:rebuild": "node scripts/skills-content-cli.cjs rebuild"
   },
   "overrides": {
     "vite": "^7"

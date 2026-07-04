@@ -13,7 +13,7 @@ const { url, title } = Astro.props as Props
 	<button
 		type="button"
 		data-share-copy={url}
-		class="share-copy-button inline-flex items-center gap-2 rounded-full border border-P-border bg-P-card px-3 py-1.5 text-sm font-medium text-P-link transition-colors hover:bg-P-muted hover:text-P-link-hover"
+		class="share-copy-button inline-flex items-center gap-2 rounded-sm border border-P-border bg-P-card px-3 py-1.5 text-sm font-medium text-P-link transition-colors hover:bg-P-muted hover:text-P-link-hover"
 	>
 		<Copy class="share-copy-idle size-4" aria-hidden="true" />
 		<Check class="share-copy-done hidden size-4" aria-hidden="true" />

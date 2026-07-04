@@ -1,0 +1,18 @@
+---
+type Props = {
+	label: string
+	href?: string
+}
+
+const { label, href } = Astro.props as Props
+---
+
+{
+	href ? (
+		<a class="skills-keyword skills-keyword-link" href={href}>
+			{label}
+		</a>
+	) : (
+		<span class="skills-keyword">{label}</span>
+	)
+}

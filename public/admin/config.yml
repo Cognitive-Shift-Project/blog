@@ -1,0 +1,295 @@
+# yaml-language-server: $schema=https://unpkg.com/@sveltia/cms/schema/sveltia-cms.json
+
+backend:
+  name: github
+  repo: Cognitive-Shift-Project/blog
+  branch: master
+  # For production OAuth, deploy Sveltia CMS Authenticator and set:
+  # base_url: https://your-auth-worker.example.com
+
+site_url: https://cognitive-shift-project.raphael-gabbay.workers.dev
+display_url: https://cognitive-shift-project.raphael-gabbay.workers.dev
+logo_url: /logo.svg
+
+media_folder: /public/uploads
+public_folder: /uploads
+
+slug:
+  encoding: ascii
+  clean_accents: true
+  sanitize_replacement: "-"
+
+collections:
+  - name: blog
+    label: Blog
+    label_singular: Article
+    description: Articles published on the Cognitive Shift Project blog.
+    folder: /src/content/blog
+    create: true
+    delete: false
+    format: yaml-frontmatter
+    extension: mdx
+    slug: "{{publishedAt | date('YYYY-MM-DD')}}-{{slug}}"
+    preview_path: blog/{{slug}}
+    sortable_fields:
+      - title
+      - publishedAt
+      - draft
+    view_filters:
+      - label: Published
+        field: draft
+        pattern: false
+      - label: Drafts
+        field: draft
+        pattern: true
+    fields:
+      - label: Title
+        name: title
+        widget: string
+        required: true
+      - label: Description
+        name: description
+        widget: text
+        required: false
+        hint: Short summary used on listings, search, RSS, and social previews.
+      - label: Thumbnail image
+        name: thumbnail
+        widget: image
+        required: false
+        choose_url: true
+        hint: Optional preview image shown on blog cards, tag results, related posts, and the post page.
+      - label: Thumbnail alt text
+        name: thumbnailAlt
+        widget: string
+        required: false
+        hint: Describe the thumbnail for accessibility. Leave empty only if the image is decorative.
+      - label: Published date
+        name: publishedAt
+        widget: datetime
+        type: date
+        required: true
+      - label: Updated date
+        name: updatedAt
+        widget: datetime
+        type: date
+        required: false
+      - label: Tags
+        name: tags
+        widget: list
+        required: false
+        default: []
+        field:
+          label: Tag
+          name: tag
+          widget: string
+      - label: Draft
+        name: draft
+        widget: boolean
+        default: true
+        hint: Draft articles are hidden from the site, RSS, tags, and search.
+      - label: Body
+        name: body
+        widget: richtext
+        required: false
+        modes:
+          - rich_text
+          - raw
+        hint: Use raw mode for advanced MDX imports or custom components.
+  - name: skills_articles
+    label: Skills Articles
+    label_singular: Skills Article
+    description: Imported Repo B resources shown in the /skills library.
+    folder: /src/content/skills/articles
+    path: "{{slug}}/index"
+    create: true
+    delete: false
+    format: yaml-frontmatter
+    extension: mdx
+    identifier_field: name
+    media_folder: /public/skills-content/articles/{{slug}}
+    public_folder: /skills-content/articles/{{slug}}
+    preview_path: skills/{{slug}}
+    sortable_fields:
+      - name
+      - type
+      - category
+      - draft
+    view_filters:
+      - label: Published
+        field: draft
+        pattern: false
+      - label: Drafts
+        field: draft
+        pattern: true
+    fields:
+      - label: Name
+        name: name
+        widget: string
+        required: true
+        hint: Maximum 18 characters to preserve the imported card/detail design.
+      - label: Route slug
+        name: slug
+        widget: string
+        required: false
+        hint: Optional public URL slug, for example language-model. Falls back to the content folder name.
+      - label: Type
+        name: type
+        widget: select
+        required: true
+        options:
+          - pdf
+          - md
+          - folder
+          - file
+          - other
+      - label: Category
+        name: category
+        widget: relation
+        collection: skills_categories
+        search_fields:
+          - name
+          - slug
+        display_fields:
+          - name
+        value_field: slug
+        required: true
+      - label: Short description
+        name: shortDescription
+        widget: string
+        required: true
+        hint: Maximum 42 characters. Shown under the cover card.
+      - label: Description
+        name: description
+        widget: text
+        required: true
+        hint: Maximum 260 characters. Shown on the skill detail page.
+      - label: Keywords
+        name: keywords
+        widget: list
+        required: true
+        default: []
+        field:
+          label: Keyword
+          name: keyword
+          widget: string
+      - label: Cover
+        name: cover
+        widget: file
+        required: true
+        choose_url: true
+        hint: Public path such as /skills-content/articles/make-it-scroll/cover.png.
+      - label: Cover preview
+        name: coverPreview
+        widget: file
+        required: false
+        choose_url: true
+        hint: PNG preview used when the main cover is a PDF.
+      - label: Resource path
+        name: resourcePath
+        widget: file
+        required: true
+        choose_url: true
+        hint: Public path to the downloadable/openable resource.
+      - label: Draft
+        name: draft
+        widget: boolean
+        default: false
+      - label: Body
+        name: body
+        widget: richtext
+        required: false
+        modes:
+          - rich_text
+          - raw
+        hint: Used for Markdown skill pages. PDF/folder/file resources can leave this empty.
+  - name: skills_categories
+    label: Skills Categories
+    label_singular: Skills Category
+    description: Categories used by the /skills library.
+    folder: /src/content/skills/categories
+    create: true
+    delete: false
+    format: json
+    extension: json
+    identifier_field: name
+    slug: "{{slug}}"
+    fields:
+      - label: Slug
+        name: slug
+        widget: string
+        required: true
+      - label: Name
+        name: name
+        widget: string
+        required: true
+      - label: Description
+        name: description
+        widget: text
+        required: false
+        default: ""
+  - name: skills_manifesto
+    label: Skills Manifesto
+    description: Manifesto page displayed at /skills/manifest.
+    format: yaml-frontmatter
+    extension: mdx
+    files:
+      - name: manifest
+        label: Skills Manifesto
+        file: /src/content/skills/manifest.mdx
+        fields:
+          - label: Title
+            name: title
+            widget: string
+            required: true
+          - label: Description
+            name: description
+            widget: text
+            required: true
+          - label: Body
+            name: body
+            widget: richtext
+            required: true
+            modes:
+              - rich_text
+              - raw
+  - name: skills_settings
+    label: Skills Settings
+    description: Copy and labels for the /skills library page.
+    format: json
+    files:
+      - name: settings
+        label: Skills Settings
+        file: /src/content/skills/settings.json
+        fields:
+          - label: Hero title lines
+            name: heroTitle
+            widget: list
+            required: true
+            field:
+              label: Line
+              name: line
+              widget: string
+          - label: Hero description
+            name: heroDescription
+            widget: text
+            required: true
+          - label: Search label
+            name: searchLabel
+            widget: string
+            required: true
+          - label: Empty state
+            name: emptyState
+            widget: string
+            required: true
+          - label: Manifesto title
+            name: manifestoTitle
+            widget: string
+            required: true
+          - label: Manifesto description
+            name: manifestoDescription
+            widget: text
+            required: true
+          - label: Manifesto link label
+            name: manifestoLinkLabel
+            widget: string
+            required: true

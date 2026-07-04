@@ -9,10 +9,10 @@ import { Search, X } from '@lucide/astro'
 >
 	<div
 		id="search-dialog"
-		class="w-full max-w-2xl scale-95 overflow-hidden rounded-lg border border-P-border bg-P-card shadow-2xl transition-transform"
+		class="w-full max-w-2xl scale-95 overflow-hidden rounded-md border border-P-border bg-P-card shadow-2xl transition-transform"
 		role="dialog"
 		aria-modal="true"
-		aria-label="Search posts"
+		aria-label="Search"
 	>
 		<div class="flex items-center gap-3 border-b border-P-border px-4 py-3">
 			<Search class="size-5 text-P-subtle" aria-hidden="true" />
@@ -20,13 +20,13 @@ import { Search, X } from '@lucide/astro'
 				id="search-input"
 				type="search"
 				class="min-w-0 flex-1 bg-transparent text-base text-P-fg outline-none placeholder:text-P-subtle"
-				placeholder="Search posts..."
+				placeholder="Search posts and skills..."
 				autocomplete="off"
 			/>
 			<button
 				id="search-close"
 				type="button"
-				class="inline-flex size-8 items-center justify-center rounded-md text-P-subtle transition-colors hover:bg-P-muted hover:text-P-fg"
+				class="inline-flex size-8 items-center justify-center rounded-sm text-P-subtle transition-colors hover:bg-P-muted hover:text-P-fg"
 				aria-label="Close search"
 			>
 				<X class="size-5" aria-hidden="true" />
@@ -39,12 +39,16 @@ import { Search, X } from '@lucide/astro'
 
 <script>
 	type SearchItem = {
+		source: 'blog' | 'skills'
+		type: string
 		title: string
 		description: string
 		tags: string[]
 		href: string
-		publishedAt: string
-		readTime: number
+		thumbnail?: string | undefined
+		thumbnailAlt?: string | undefined
+		publishedAt?: string
+		readTime?: number
 	}
 
 	let searchItems: SearchItem[] | undefined
@@ -71,27 +75,40 @@ import { Search, X } from '@lucide/astro'
 		}
 
 		const matches = (searchItems ?? []).filter((item) => {
-			const haystack = [item.title, item.description, item.publishedAt, ...item.tags].join(' ').toLowerCase()
+			const haystack = [item.title, item.description, item.publishedAt, item.source, item.type, ...item.tags]
+				.join(' ')
+				.toLowerCase()
 			return haystack.includes(normalizedQuery)
 		})
 
 		if (matches.length === 0) {
-			status.textContent = 'No posts found.'
+			status.textContent = 'No results found.'
 			status.classList.remove('hidden')
 			return
 		}
 
 		status.classList.add('hidden')
 		results.innerHTML = matches
-			.map(
-				(item) => `
-					<a href="${item.href}" class="block rounded-md px-3 py-3 no-underline transition-colors hover:bg-P-muted">
-						<span class="block text-base font-semibold text-P-link">${item.title}</span>
-						<span class="mt-1 block text-sm text-P-subtle">${item.readTime} min read · ${item.publishedAt}</span>
-						${item.description ? `<span class="mt-1 block text-sm text-P-lead">${item.description}</span>` : ''}
+			.map((item) => {
+				const meta =
+					item.source === 'blog'
+						? `${item.readTime ?? 1} min read · ${item.publishedAt ?? ''}`
+						: `Skills · ${item.type}`
+				const thumbnail = item.thumbnail
+					? `<img src="${item.thumbnail}" alt="${item.thumbnailAlt ?? ''}" class="h-16 w-24 rounded-sm object-cover" loading="lazy" />`
+					: ''
+
+				return `
+					<a href="${item.href}" class="flex gap-3 rounded-sm px-3 py-3 no-underline transition-colors hover:bg-P-muted">
+						${thumbnail}
+						<span class="min-w-0">
+							<span class="block text-base font-semibold text-P-link">${item.title}</span>
+							<span class="mt-1 block text-sm text-P-subtle">${meta}</span>
+							${item.description ? `<span class="mt-1 block text-sm text-P-lead">${item.description}</span>` : ''}
+						</span>
 					</a>
-				`,
-			)
+				`
+			})
 			.join('')
 	}
 

@@ -2,7 +2,7 @@
 import '@/styles/global.css'
 import { ClientRouter } from 'astro:transitions'
 import { Font } from 'astro:assets'
-import { Moon, Search, Sun } from '@lucide/astro'
+import { BookOpen, FileText, FlaskConical, Moon, Search, Sun, Tags } from '@lucide/astro'
 import { DEFAULT_LOCALE, LAYOUT_NAV_LINKS } from '@/constants'
 import { cn } from '@/lib/style'
 import { SITE_BRAND_NAME } from '@/constants'
@@ -12,6 +12,8 @@ import { ensureTrailingSlash } from '@/lib/slashes'
 import Logo from '@/components/Logo.astro'
 import SearchOverlay from '@/components/blog/SearchOverlay.astro'
 import CustomCursor from '@/components/blog/CustomCursor.astro'
+import LinkAffordances from '@/components/LinkAffordances.astro'
+import Link from '@/components/ui/Link.astro'
 
 type Props = {
 	variant?: 'page' | 'post' | 'layout' | 'full'
@@ -43,6 +45,14 @@ const locale = new Intl.Locale(Astro.currentLocale || DEFAULT_LOCALE)
 const dir = locale.getTextInfo().direction
 
 const containerPaddingClassName = cn('px-4 py-8 sm:py-12 md:py-16')
+
+const mobileNavLinks = [
+	{ label: 'Home', href: '/', icon: 'logo', isActive: isCurrentPathname('/') },
+	{ label: 'Blog', href: '/blog/', Icon: BookOpen, isActive: isActivePathname('/blog/') },
+	{ label: 'Skills', href: '/skills/', Icon: FlaskConical, isActive: isActivePathname('/skills/') },
+	{ label: 'Tags', href: '/tags/', Icon: Tags, isActive: isActivePathname('/tags/') },
+	{ label: 'Docs', href: '/docs/', Icon: FileText, isActive: isActivePathname('/docs/') },
+]
 ---
 
 <!doctype html>
@@ -65,32 +75,50 @@ const containerPaddingClassName = cn('px-4 py-8 sm:py-12 md:py-16')
 
 		<HeadSeoMeta canonicalUrl={canonicalUrl} meta={meta} />
 		<script is:inline>
-			const storedTheme = localStorage.getItem('theme')
-			const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-			document.documentElement.classList.toggle('dark', storedTheme ? storedTheme === 'dark' : prefersDark)
+			;(function () {
+				const getPreferredTheme = () => {
+					const storedTheme = localStorage.getItem('theme')
+					if (storedTheme === 'dark' || storedTheme === 'light') return storedTheme
+					return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+				}
+
+				const applyTheme = (theme) => {
+					document.documentElement.classList.toggle('dark', theme === 'dark')
+					document.documentElement.style.colorScheme = theme
+				}
+
+				const applyStoredTheme = () => applyTheme(getPreferredTheme())
+
+				applyStoredTheme()
+
+				if (!window.__cognitiveShiftThemeReady) {
+					window.__cognitiveShiftThemeReady = true
+					document.addEventListener('astro:after-swap', applyStoredTheme)
+				}
+			})()
 		</script>
 		<ClientRouter />
 	</head>
 	<body class="flex flex-col min-h-dvh antialiased bg-P-bg text-P-fg">
-		<header class="flex items-center min-h-(--layout-header-height) border-b border-P-border text-lg">
+		<header class="site-header flex items-center min-h-(--layout-header-height) border-b border-P-border text-lg">
 			<nav
-				class="flex flex-wrap items-center justify-between gap-4 sm:gap-6 max-w-(--layout-max-width) mx-auto w-full px-4 py-4"
+				class="flex flex-nowrap items-center justify-between gap-3 sm:gap-6 max-w-(--layout-max-width) mx-auto w-full px-4 py-4"
 			>
 				<a href="/" class="nav-home" aria-current={isCurrentPathname('/') ? 'page' : undefined}
 					><Logo class="h-6 w-auto" /></a
 				>
-				<ul class="flex items-center gap-6">
+				<ul class="desktop-nav-links flex items-center gap-6">
 					{
 						LAYOUT_NAV_LINKS.map((link) => (
 							<li>
-								<a
+								<Link
 									href={link.href}
-									class="nav-link"
-									data-active={isActivePathname(link.href) ? 'true' : undefined}
+									variant="nav"
+									active={isActivePathname(link.href)}
 									aria-current={isCurrentPathname(link.href) ? 'page' : undefined}
 								>
 									{link.label}
-								</a>
+								</Link>
 							</li>
 						))
 					}
@@ -111,8 +139,33 @@ const containerPaddingClassName = cn('px-4 py-8 sm:py-12 md:py-16')
 							type="button"
 							class="nav-icon-button"
 							data-search-open
-							aria-label="Search posts"
-							title="Search posts"
+							aria-label="Search"
+							title="Search"
+						>
+							<Search class="size-5" aria-hidden="true" />
+						</button>
+					</li>
+				</ul>
+				<ul class="mobile-header-actions flex items-center gap-2">
+					<li>
+						<button
+							type="button"
+							class="nav-icon-button"
+							data-theme-toggle
+							aria-label="Toggle dark mode"
+							title="Toggle dark mode"
+						>
+							<Moon class="size-5 dark:hidden" aria-hidden="true" />
+							<Sun class="hidden size-5 dark:block" aria-hidden="true" />
+						</button>
+					</li>
+					<li>
+						<button
+							type="button"
+							class="nav-icon-button"
+							data-search-open
+							aria-label="Search"
+							title="Search"
 						>
 							<Search class="size-5" aria-hidden="true" />
 						</button>
@@ -127,7 +180,7 @@ const containerPaddingClassName = cn('px-4 py-8 sm:py-12 md:py-16')
 						<slot />
 					</article>
 				) : variant === 'page' ? (
-					<div class={cn('mx-auto w-full max-w-prose', containerPaddingClassName, containerClassName)}>
+					<div class={cn('mx-auto w-full max-w-(--layout-page-width)', containerPaddingClassName, containerClassName)}>
 						<slot />
 					</div>
 				) : variant === 'layout' ? (
@@ -145,21 +198,98 @@ const containerPaddingClassName = cn('px-4 py-8 sm:py-12 md:py-16')
 				{new Date().getFullYear()}
 			</div>
 		</footer>
+		<nav class="mobile-bottom-nav" aria-label="Primary navigation">
+			<ul class="mobile-bottom-nav-list">
+				{
+					mobileNavLinks.map(({ label, href, Icon, isActive }) => (
+						<li>
+							<a
+								href={href}
+								class="mobile-tab-link"
+								data-active={isActive ? 'true' : undefined}
+								aria-current={isCurrentPathname(href) ? 'page' : undefined}
+								data-link-affordance="false"
+							>
+								{Icon ? (
+									<Icon class="mobile-tab-icon" aria-hidden="true" />
+								) : (
+									<Logo class="mobile-tab-logo" showText={false} />
+								)}
+								<span>{label}</span>
+							</a>
+						</li>
+					))
+				}
+			</ul>
+		</nav>
 		<CustomCursor />
+		<LinkAffordances />
 		<SearchOverlay />
 		<script is:inline>
-			const applyTheme = (theme) => {
-				document.documentElement.classList.toggle('dark', theme === 'dark')
-				localStorage.setItem('theme', theme)
-			}
+			;(function () {
+				if (window.__cognitiveShiftThemeToggleReady) return
+				window.__cognitiveShiftThemeToggleReady = true
 
-			document.addEventListener('click', (event) => {
-				const button = event.target instanceof Element ? event.target.closest('[data-theme-toggle]') : null
-				if (!button) return
+				const applyTheme = (theme) => {
+					document.documentElement.classList.toggle('dark', theme === 'dark')
+					document.documentElement.style.colorScheme = theme
+					localStorage.setItem('theme', theme)
+				}
 
-				const isDark = document.documentElement.classList.contains('dark')
-				applyTheme(isDark ? 'light' : 'dark')
-			})
+				document.addEventListener('click', (event) => {
+					const button = event.target instanceof Element ? event.target.closest('[data-theme-toggle]') : null
+					if (!button) return
+
+					const isDark = document.documentElement.classList.contains('dark')
+					applyTheme(isDark ? 'light' : 'dark')
+				})
+			})()
+		</script>
+		<script is:inline>
+			;(function () {
+				if (window.__cognitiveShiftMobileTopBarReady) return
+				window.__cognitiveShiftMobileTopBarReady = true
+
+				let lastScrollY = window.scrollY
+				let ticking = false
+
+				const setHeaderState = (state) => {
+					const header = document.querySelector('.site-header')
+					if (!(header instanceof HTMLElement)) return
+					header.dataset.mobileState = state
+				}
+
+				const updateHeader = () => {
+					ticking = false
+
+					const currentScrollY = Math.max(window.scrollY, 0)
+					const delta = currentScrollY - lastScrollY
+
+					if (currentScrollY < 24) {
+						setHeaderState('visible')
+					} else if (delta > 8 && currentScrollY > 96) {
+						setHeaderState('hidden')
+					} else if (delta < -8) {
+						setHeaderState('visible')
+					}
+
+					lastScrollY = currentScrollY
+				}
+
+				const requestUpdate = () => {
+					if (ticking) return
+					ticking = true
+					window.requestAnimationFrame(updateHeader)
+				}
+
+				window.addEventListener('scroll', requestUpdate, { passive: true })
+				window.addEventListener('resize', requestUpdate)
+				document.addEventListener('astro:page-load', () => {
+					lastScrollY = window.scrollY
+					setHeaderState('visible')
+					requestUpdate()
+				})
+			})()
 		</script>
 	</body>
 </html>
@@ -168,19 +298,134 @@ const containerPaddingClassName = cn('px-4 py-8 sm:py-12 md:py-16')
 	@reference "@/styles/global.css";
 
 	.nav-home {
-		@apply block font-semibold px-2 -mx-2 text-P-heading transition-colors;
-		@apply hover:rounded-sm hover:bg-P-muted hover:text-P-link;
+		@apply inline-flex min-w-0 flex-1 items-center font-semibold text-P-heading transition-colors;
+		@apply hover:text-P-link focus-visible:text-P-link;
+		max-width: max-content;
+		text-decoration: none;
 	}
 
-	a.nav-link {
-		@apply block font-semibold rounded-sm px-2 -mx-2 py-1.5 -my-1.5 transition-[color,text-decoration-thickness];
-		@apply text-P-link hover:text-P-link-hover;
-		@apply underline-offset-2 decoration-current decoration-[1.5px];
-		@apply hover:underline data-active:underline;
+	.nav-home :global(.logo-label) {
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
 	}
 
 	.nav-icon-button {
 		@apply inline-flex size-9 items-center justify-center rounded-sm text-P-link transition-colors;
 		@apply hover:bg-P-muted hover:text-P-link-hover;
+	}
+
+	.mobile-header-actions,
+	.mobile-bottom-nav {
+		display: none;
+	}
+
+	@media (max-width: 767px) {
+		:global(body) {
+			padding-bottom: calc(4.75rem + env(safe-area-inset-bottom));
+		}
+
+		.desktop-nav-links {
+			display: none;
+		}
+
+		.mobile-header-actions {
+			display: flex;
+			flex: 0 0 auto;
+		}
+
+		.mobile-bottom-nav {
+			background: color-mix(in oklch, var(--P-bg) 92%, transparent);
+			border-top: 1px solid var(--P-border);
+			bottom: 0;
+			box-shadow: 0 -10px 30px color-mix(in oklch, var(--P-black) 10%, transparent);
+			display: block;
+			left: 0;
+			padding: 0.45rem 0.75rem calc(0.45rem + env(safe-area-inset-bottom));
+			position: fixed;
+			right: 0;
+			z-index: 40;
+		}
+
+		@supports (backdrop-filter: blur(16px)) {
+			.mobile-bottom-nav {
+				backdrop-filter: blur(16px);
+			}
+		}
+
+		.mobile-bottom-nav-list {
+			display: grid;
+			gap: 0.25rem;
+			grid-template-columns: repeat(5, minmax(0, 1fr));
+			list-style: none;
+			margin: 0 auto;
+			max-width: 30rem;
+			padding: 0;
+		}
+
+		.mobile-tab-link {
+			align-items: center;
+			border-radius: 0.75rem;
+			color: var(--P-muted-fg);
+			display: grid;
+			font-size: 0.6875rem;
+			font-weight: 700;
+			gap: 0.2rem;
+			justify-items: center;
+			line-height: 1.1;
+			min-height: 3.55rem;
+			padding: 0.45rem 0.2rem;
+			text-align: center;
+			text-decoration: none;
+			touch-action: manipulation;
+			transition:
+				background-color 150ms ease,
+				color 150ms ease,
+				transform 150ms ease;
+			-webkit-tap-highlight-color: transparent;
+		}
+
+		.mobile-tab-link:hover,
+		.mobile-tab-link:focus-visible {
+			background: var(--P-muted);
+			color: var(--P-link-hover);
+			text-decoration: none;
+		}
+
+		.mobile-tab-link:active {
+			transform: scale(0.97);
+		}
+
+		.mobile-tab-link[data-active='true'] {
+			background: color-mix(in oklch, var(--P-link) 14%, transparent);
+			color: var(--P-link);
+		}
+
+		.mobile-tab-icon {
+			height: 1.35rem;
+			width: 1.35rem;
+		}
+
+		.mobile-tab-logo {
+			height: 1.35rem;
+			width: 1.35rem;
+		}
+
+		.mobile-tab-logo :global(svg) {
+			height: 100%;
+			width: 100%;
+		}
+
+		.nav-home {
+			font-size: 0.95rem;
+			max-width: min(100%, 16rem);
+		}
+	}
+
+	@media (max-width: 380px) {
+		.nav-home {
+			font-size: 0.875rem;
+			max-width: min(100%, 14rem);
+		}
 	}
 </style>

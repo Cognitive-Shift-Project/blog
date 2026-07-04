@@ -1,0 +1,26 @@
+---
+import '@/styles/skills.css'
+import Layout from '@/layouts/Layout.astro'
+import type { SkillSettings } from '@/lib/skills'
+
+type Props = {
+	settings: SkillSettings
+}
+
+const { settings } = Astro.props as Props
+---
+
+<Layout
+	variant="full"
+	meta={{
+		type: 'page',
+		title: 'Skills',
+		description: settings.heroDescription,
+	}}
+>
+	<div class="skills-surface">
+		<main class="skills-shell">
+			<slot />
+		</main>
+	</div>
+</Layout>

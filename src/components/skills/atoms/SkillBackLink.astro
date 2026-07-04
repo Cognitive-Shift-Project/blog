@@ -1,0 +1,17 @@
+---
+import { ArrowLeft } from '@lucide/astro'
+
+type Props = {
+	href: string
+	label: string
+}
+
+const { href, label } = Astro.props as Props
+---
+
+<nav class="skills-page-nav" aria-label="Page navigation">
+	<a class="skills-back-link" href={href} aria-label={label}>
+		<ArrowLeft size={15} stroke-width={1.8} aria-hidden="true" />
+		<span>{label}</span>
+	</a>
+</nav>

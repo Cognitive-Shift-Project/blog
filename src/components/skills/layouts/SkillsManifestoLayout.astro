@@ -1,0 +1,30 @@
+---
+import '@/styles/skills.css'
+import SkillBackLink from '@/components/skills/atoms/SkillBackLink.astro'
+import Layout from '@/layouts/Layout.astro'
+
+type Props = {
+	title: string
+	description: string
+}
+
+const { title, description } = Astro.props as Props
+---
+
+<Layout
+	variant="full"
+	meta={{
+		type: 'page',
+		title,
+		description,
+	}}
+>
+	<div class="skills-surface">
+		<main class="skills-manifest-page">
+			<SkillBackLink href="/skills/" label="Back to articles" />
+			<article class="skills-manifest-content">
+				<slot />
+			</article>
+		</main>
+	</div>
+</Layout>

@@ -1,0 +1,23 @@
+---
+import SkillCoverImage from '@/components/skills/atoms/SkillCoverImage.astro'
+import SkillDownloadButton from '@/components/skills/atoms/SkillDownloadButton.astro'
+import { normalizeSkillArticle, type SkillArticle } from '@/lib/skills'
+
+type Props = {
+	article: SkillArticle
+}
+
+const { article } = Astro.props as Props
+const item = normalizeSkillArticle(article)
+const searchable = [item.name, item.shortDescription, item.description, item.category, ...item.keywords].join(' ').toLowerCase()
+---
+
+<article class="skills-card" data-skills-article data-searchable={searchable} data-category={item.category}>
+	<a class="skills-cover-link" href={item.href} aria-label={`Open ${item.name}`}>
+		<SkillCoverImage src={item.coverPreviewPath} />
+	</a>
+	<div class="skills-meta-row">
+		<p class="skills-short">{item.shortDescription || item.name}</p>
+		<SkillDownloadButton href={item.contentPath} label={`Download ${item.name}`} variant="dot" />
+	</div>
+</article>

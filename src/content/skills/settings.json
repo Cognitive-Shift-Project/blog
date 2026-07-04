@@ -1,0 +1,13 @@
+{
+  "heroTitle": [
+    "Build lean",
+    "Measure fast",
+    "Keep only what wins."
+  ],
+  "heroDescription": "Cognitive Shift transforms cutting-edge AI research from MIT and the best practices developed by leading Silicon Valley companies into directly applicable frameworks.",
+  "searchLabel": "Search articles",
+  "emptyState": "No article found.",
+  "manifestoTitle": "Manifesto",
+  "manifestoDescription": "The Cognitive Shift Project is an independent research initiative focused on cognitive AI architectures and formal representations of intelligence. It supports open, iterative research where ideas can be shared, criticized, improved, and evaluated without depending entirely on traditional institutional paths.",
+  "manifestoLinkLabel": "Read the full manifesto"
+}

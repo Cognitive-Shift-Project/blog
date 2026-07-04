@@ -1,0 +1,72 @@
+---
+import SkillSearchInput from '@/components/skills/atoms/SkillSearchInput.astro'
+import SkillsLibraryLayout from '@/components/skills/layouts/SkillsLibraryLayout.astro'
+import SkillCategorySection from '@/components/skills/molecules/SkillCategorySection.astro'
+import SkillEmptyState from '@/components/skills/molecules/SkillEmptyState.astro'
+import { getSkillCategoryGroups, getSkillManifestoHref, getSkillSettings } from '@/lib/skills'
+
+const [settings, groups] = await Promise.all([getSkillSettings(), getSkillCategoryGroups()])
+---
+
+<SkillsLibraryLayout settings={settings}>
+	<section class="skills-hero" aria-labelledby="skills-hero-title">
+		<h1 id="skills-hero-title">
+			{settings.heroTitle.map((line) => <span>{line}</span>)}
+		</h1>
+		<p>{settings.heroDescription}</p>
+	</section>
+
+	<section class="skills-library" aria-label="Article library">
+		<SkillSearchInput label={settings.searchLabel} />
+		<div class="skills-category-list" data-skills-category-list aria-live="polite">
+			{groups.map((group) => <SkillCategorySection group={group} />)}
+		</div>
+		<SkillEmptyState message={settings.emptyState} />
+	</section>
+
+	<section class="skills-manifest-teaser" aria-labelledby="skills-manifest-title">
+		<h2 id="skills-manifest-title">{settings.manifestoTitle}</h2>
+		<p>{settings.manifestoDescription}</p>
+		<a href={getSkillManifestoHref()}>{settings.manifestoLinkLabel}</a>
+	</section>
+
+	<script>
+		const searchInput = document.querySelector<HTMLInputElement>('[data-skills-search]')
+		const searchClear = document.querySelector<HTMLButtonElement>('[data-skills-search-clear]')
+		const emptyState = document.querySelector<HTMLElement>('[data-skills-empty]')
+		const sections = [...document.querySelectorAll<HTMLElement>('[data-skills-category]')]
+
+		const updateSkillsSearch = () => {
+			const query = searchInput?.value.trim().toLowerCase() ?? ''
+			let visibleArticles = 0
+
+			for (const section of sections) {
+				const sectionText = section.textContent?.toLowerCase() ?? ''
+				const cards = [...section.querySelectorAll<HTMLElement>('[data-skills-article]')]
+				let visibleInSection = 0
+
+				for (const card of cards) {
+					const searchable = `${card.dataset.searchable ?? ''} ${sectionText}`
+					const isVisible = !query || searchable.includes(query)
+					card.hidden = !isVisible
+					if (isVisible) visibleInSection += 1
+				}
+
+				section.hidden = visibleInSection === 0 && query.length > 0
+				visibleArticles += visibleInSection
+			}
+
+			if (emptyState) emptyState.hidden = visibleArticles !== 0
+			if (searchClear) searchClear.hidden = query.length === 0
+		}
+
+		searchInput?.addEventListener('input', updateSkillsSearch)
+		searchClear?.addEventListener('click', () => {
+			if (!searchInput) return
+			searchInput.value = ''
+			searchInput.focus()
+			updateSkillsSearch()
+		})
+		updateSkillsSearch()
+	</script>
+</SkillsLibraryLayout>

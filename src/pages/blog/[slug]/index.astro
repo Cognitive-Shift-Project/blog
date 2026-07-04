@@ -5,8 +5,8 @@ import FormattedDate from '@/components/FormattedDate.astro'
 import ShareButtons from '@/components/blog/ShareButtons.astro'
 import TableOfContents from '@/components/blog/TableOfContents.astro'
 import Badge from '@/components/ui/Badge.astro'
+import PostPreview from '@/components/blog/PostPreview.astro'
 import { getBlogPostHref, getPublishedBlogPosts, getReadTimeMinutes, getRelatedPosts, getTagHref } from '@/lib/blog'
-import { cn } from '@/lib/style'
 
 type Props = { post: CollectionEntry<'blog'> }
 
@@ -20,7 +20,7 @@ export async function getStaticPaths() {
 }
 
 const { post } = Astro.props
-const { title, description, publishedAt, updatedAt, tags } = post.data
+const { title, description, publishedAt, updatedAt, tags, thumbnail, thumbnailAlt } = post.data
 
 const { Content, headings } = await render(post)
 const posts = await getPublishedBlogPosts()
@@ -77,6 +77,17 @@ const postUrl = new URL(getBlogPostHref(post), Astro.site ?? Astro.url).toString
 			<div class="mt-6">
 				<ShareButtons url={postUrl} title={title} />
 			</div>
+			{
+				thumbnail && (
+					<img
+						src={thumbnail}
+						alt={thumbnailAlt ?? ''}
+						class="mt-8 aspect-video w-full rounded-md border border-P-border object-cover"
+						loading="eager"
+						decoding="async"
+					/>
+				)
+			}
 		</header>
 		<div class="flex items-start gap-12">
 			<article class="prose min-w-0 flex-1">
@@ -96,18 +107,7 @@ const postUrl = new URL(getBlogPostHref(post), Astro.site ?? Astro.url).toString
 						<ul class="space-y-4">
 							{relatedPosts.map((relatedPost) => (
 								<li>
-									<a href={getBlogPostHref(relatedPost)} class="group block no-underline">
-										<h3
-											class={cn(
-												'text-lg font-semibold transition-[color,text-decoration-thickness]',
-												'underline underline-offset-2 decoration-current decoration-1 hover:decoration-[1.5px]',
-												'text-P-link group-hover:text-P-link-hover',
-											)}
-										>
-											{relatedPost.data.title}
-										</h3>
-										{relatedPost.data.description && <p class="mt-1 text-P-lead">{relatedPost.data.description}</p>}
-									</a>
+									<PostPreview post={relatedPost} compact showTags={false} />
 								</li>
 							))}
 						</ul>

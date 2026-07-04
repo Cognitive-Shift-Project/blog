@@ -1,0 +1,19 @@
+---
+import { Search, X } from '@lucide/astro'
+
+type Props = {
+	label: string
+}
+
+const { label } = Astro.props as Props
+---
+
+<div class="skills-search-row">
+	<label class="skills-search-pill" for="skills-search">
+		<Search size={13.5} stroke-width={2} aria-hidden="true" />
+		<input id="skills-search" data-skills-search type="search" autocomplete="off" placeholder={label} aria-label={label} />
+		<button class="skills-search-clear" data-skills-search-clear type="button" aria-label="Clear search" hidden>
+			<X size={15} aria-hidden="true" />
+		</button>
+	</label>
+</div>

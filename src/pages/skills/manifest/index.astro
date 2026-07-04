@@ -1,0 +1,12 @@
+---
+import { render } from 'astro:content'
+import SkillsManifestoLayout from '@/components/skills/layouts/SkillsManifestoLayout.astro'
+import { getSkillManifesto } from '@/lib/skills'
+
+const manifesto = await getSkillManifesto()
+const { Content } = await render(manifesto)
+---
+
+<SkillsManifestoLayout title={manifesto.data.title} description={manifesto.data.description}>
+	<Content />
+</SkillsManifestoLayout>

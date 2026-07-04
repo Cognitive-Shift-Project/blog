@@ -1,62 +1,182 @@
-<div
-	id="cursor"
-	class="pointer-events-none fixed left-0 top-0 z-[9999] size-3 rounded-full bg-P-link opacity-0 mix-blend-difference transition-opacity"
-	aria-hidden="true"
->
+---
+import { LOGO_PATH_D } from '@/lib/og/og-logo-svg'
+---
+
+<div id="cursor" class="custom-cursor" aria-hidden="true">
+	<svg viewBox="0 0 64 64" focusable="false">
+		<path d={LOGO_PATH_D} fill-rule="evenodd"></path>
+	</svg>
 </div>
 
 <script>
-	let cursor: HTMLElement | null = null
-	let targetX = 0
-	let targetY = 0
-	let currentX = 0
-	let currentY = 0
-	let scale = 1
-	let targetScale = 1
-	let isLoopRunning = false
+	;(() => {
+		const state = window as Window & { __cognitiveShiftCustomCursorReady?: boolean }
+		if (state.__cognitiveShiftCustomCursorReady) return
+		state.__cognitiveShiftCustomCursorReady = true
 
-	const halfCursor = 6
-	const lerpFactor = 0.15
+		const interactiveSelector = [
+			'a',
+			'button',
+			'input',
+			'select',
+			'textarea',
+			'summary',
+			'.skills-card',
+			'[role="button"]',
+			'[tabindex]:not([tabindex="-1"])',
+		].join(',')
 
-	const updateCursor = () => {
-		currentX += (targetX - currentX) * lerpFactor
-		currentY += (targetY - currentY) * lerpFactor
-		scale += (targetScale - scale) * lerpFactor
+		let cursor: HTMLElement | null = null
+		let targetX = -120
+		let targetY = -120
+		let currentX = -120
+		let currentY = -120
+		let scale = 1
+		let scaleVelocity = 0
+		let targetScale = 1
+		let rotation = 0
+		let rotationVelocity = 0
+		let isInteractive = false
+		let hasPointer = false
+		let isLoopRunning = false
+		let activeInteractiveRoot: Element | null = null
 
-		if (cursor) {
-			cursor.style.transform = `translate3d(${currentX}px, ${currentY}px, 0) scale(${scale})`
+		const cursorSize = 34
+		const halfCursor = cursorSize / 2
+		const lerpFactor = 0.18
+
+		const setInteractive = (nextInteractive: boolean) => {
+			if (isInteractive === nextInteractive) return
+			isInteractive = nextInteractive
+			targetScale = nextInteractive ? 1.38 : 1
+			if (nextInteractive) rotationVelocity += 0.5
+			cursor?.toggleAttribute('data-interactive', nextInteractive)
 		}
 
-		requestAnimationFrame(updateCursor)
-	}
-
-	document.addEventListener('astro:page-load', () => {
-		if (!matchMedia('(pointer: fine)').matches) return
-
-		document.documentElement.classList.add('has-custom-cursor')
-		cursor = document.getElementById('cursor')
-
-		if (!isLoopRunning) {
-			updateCursor()
-			isLoopRunning = true
+		const triggerRipple = () => {
+			if (!cursor) return
+			cursor.classList.remove('is-rippling')
+			void cursor.offsetWidth
+			cursor.classList.add('is-rippling')
 		}
-	})
 
-	window.addEventListener(
-		'mousemove',
-		(event) => {
+		const syncInteractiveTarget = (target: EventTarget | null) => {
+			const element = target instanceof Element ? target : null
+			const interactiveRoot = element?.closest(interactiveSelector) ?? null
+
+			if (interactiveRoot !== activeInteractiveRoot) {
+				activeInteractiveRoot = interactiveRoot
+			}
+
+			setInteractive(Boolean(interactiveRoot))
+		}
+
+		const isIframeTarget = (target: EventTarget | null) => target instanceof HTMLIFrameElement
+
+		const hideCursor = () => {
+			if (cursor) cursor.style.opacity = '0'
+		}
+
+		const updateCursor = () => {
+			currentX += (targetX - currentX) * lerpFactor
+			currentY += (targetY - currentY) * lerpFactor
+
+			scaleVelocity += (targetScale - scale) * 0.14
+			scaleVelocity *= 0.82
+			scale += scaleVelocity
+
+			if (isInteractive) {
+				rotationVelocity += (1.15 - rotationVelocity) * 0.035
+			} else {
+				const rotationDistanceToHome = ((-rotation + 540) % 360) - 180
+				rotationVelocity += rotationDistanceToHome * 0.018
+				rotationVelocity *= 0.9
+			}
+			rotation += rotationVelocity
+			if (Math.abs(rotation) > 360) rotation %= 360
+			if (!isInteractive && Math.abs(rotation) < 0.01 && Math.abs(rotationVelocity) < 0.01) {
+				rotation = 0
+				rotationVelocity = 0
+			}
+
+			if (cursor) {
+				cursor.style.transform = `translate3d(${currentX}px, ${currentY}px, 0) rotate(${rotation}deg) scale(${scale})`
+			}
+
+			requestAnimationFrame(updateCursor)
+		}
+
+		const initialize = () => {
+			if (!matchMedia('(pointer: fine)').matches) return
+
+			document.documentElement.classList.add('has-custom-cursor')
+			cursor = document.getElementById('cursor')
+
+			if (!isLoopRunning) {
+				updateCursor()
+				isLoopRunning = true
+			}
+		}
+
+		const handleMove = (event: MouseEvent) => {
+			if (!matchMedia('(pointer: fine)').matches) return
+
+			if (isIframeTarget(event.target)) {
+				hideCursor()
+				return
+			}
+
+			hasPointer = true
 			targetX = event.clientX - halfCursor
 			targetY = event.clientY - halfCursor
 			if (cursor) cursor.style.opacity = '1'
-		},
-		{ passive: true },
-	)
+			syncInteractiveTarget(event.target)
+		}
 
-	document.addEventListener(
-		'mouseover',
-		(event) => {
-			targetScale = event.target instanceof Element && event.target.closest('a, button') ? 1.8 : 1
-		},
-		{ passive: true },
-	)
+		const handleViewportExit = (event: MouseEvent) => {
+			if (event.relatedTarget !== null) return
+			hasPointer = false
+			hideCursor()
+		}
+
+		const handleClick = (event: MouseEvent) => {
+			if (!matchMedia('(pointer: fine)').matches || isIframeTarget(event.target)) return
+			const element = event.target instanceof Element ? event.target : null
+			if (element?.closest(interactiveSelector)) triggerRipple()
+		}
+
+		document.addEventListener('astro:page-load', initialize)
+		document.addEventListener('astro:after-swap', initialize)
+		document.addEventListener('mousemove', handleMove, { passive: true })
+		document.addEventListener('mouseout', handleViewportExit, { passive: true })
+		document.addEventListener('click', handleClick)
+		document.addEventListener(
+			'mouseover',
+			(event) => {
+				if (isIframeTarget(event.target)) {
+					hideCursor()
+					activeInteractiveRoot = null
+					setInteractive(false)
+					return
+				}
+				if (!hasPointer) return
+				syncInteractiveTarget(event.target)
+			},
+			{ passive: true },
+		)
+		document.addEventListener(
+			'mouseout',
+			(event) => {
+				const element = event.target instanceof Element ? event.target : null
+				if (!element?.closest(interactiveSelector)) return
+				const related = event.relatedTarget instanceof Element ? event.relatedTarget : null
+				if (related?.closest(interactiveSelector)) return
+				activeInteractiveRoot = null
+				setInteractive(false)
+			},
+			{ passive: true },
+		)
+
+		initialize()
+	})()
 </script>

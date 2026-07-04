@@ -1,0 +1,77 @@
+---
+import { FileText, FolderOpen } from '@lucide/astro'
+import type { NormalizedSkillArticle, SkillContentKind, SkillFolderEntry } from '@/lib/skills'
+
+type Props = {
+	article: NormalizedSkillArticle
+	contentKind: SkillContentKind
+	folderEntries?: SkillFolderEntry[]
+}
+
+const { article, contentKind, folderEntries = [] } = Astro.props as Props
+const pdfSrc = `${article.contentPath}#toolbar=0&navpanes=0&scrollbar=0&view=FitH&pagemode=none`
+
+const formatFileSize = (bytes: number): string => {
+	if (bytes < 1024) return `${bytes} B`
+	if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
+	return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
+}
+---
+
+<div class="skills-article-media">
+	{
+		contentKind === 'pdf' ? (
+			<div class="skills-pdf-shell">
+				<iframe class="skills-viewer-frame" src={pdfSrc} title={`${article.name} PDF`} />
+			</div>
+		) : contentKind === 'md' ? (
+			<div class="skills-markdown-content">
+				<slot />
+			</div>
+		) : contentKind === 'folder' ? (
+			<div class="skills-folder-preview">
+				<header class="skills-folder-preview-header">
+					<span class="skills-folder-icon" aria-hidden="true" />
+					<div>
+						<h2>Folder contents</h2>
+						<p>{folderEntries.length} {folderEntries.length === 1 ? 'file' : 'files'} available to open or download.</p>
+					</div>
+				</header>
+				{
+					folderEntries.length > 0 ? (
+						<ul class="skills-folder-file-list">
+							{folderEntries.map((entry) => (
+								<li>
+									<a href={entry.href} class="skills-folder-file" target="_blank" rel="noopener noreferrer">
+										<span class="skills-folder-file-icon" aria-hidden="true">
+											<FileText size={18} />
+										</span>
+										<span class="skills-folder-file-main">
+											<span class="skills-folder-file-name">{entry.name}</span>
+											<span class="skills-folder-file-meta">
+												{entry.extension ? entry.extension.toUpperCase() : 'FILE'} · {formatFileSize(entry.sizeBytes)}
+											</span>
+										</span>
+										<span class="skills-folder-file-action">Open</span>
+									</a>
+								</li>
+							))}
+						</ul>
+					) : (
+						<div class="skills-file-preview skills-file-preview--folder">
+							<FolderOpen size={44} aria-hidden="true" />
+							<p>This folder is empty.</p>
+						</div>
+					)
+				}
+			</div>
+		) : (
+			<div class="skills-file-preview">
+				<p>This document type is available as a download.</p>
+				<p>
+					<a href={article.contentPath} download>Download {article.name}</a>
+				</p>
+			</div>
+		)
+	}
+</div>

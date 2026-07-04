@@ -29,9 +29,47 @@ URL: TBD — hosted on Astro v6 on Cloudflare Workers, MDX-driven blog.
 | `pnpm check` | Biome + Prettier + `astro check` |
 | `pnpm typecheck` | TypeScript + `astro check` |
 | `pnpm preflight` | Typecheck + build in one pass |
+| `pnpm skills:content -- validate` | Validate imported skills CMS objects and assets |
+| `pnpm skills:content -- rebuild` | Validate skills content and regenerate stale PDF cover previews |
 | `pnpm deploy:worker` | Build and deploy via Wrangler |
 
 Copy `wrangler.example.jsonc` → `wrangler.jsonc` and run `pnpm typegen` before first use.
+
+## Editorial CMS
+
+The site includes a Sveltia CMS admin at `/admin/`. It edits blog posts directly in
+`src/content/blog/*.mdx` and the imported Skills library in `src/content/skills/**` using the same Astro
+content collections that power the public site.
+
+Local CMS workflow:
+
+1. Run the Astro dev server with `pnpm dev`.
+2. Open `http://localhost:4322/admin/index.html` in Chrome, Edge, Brave, or another Chromium browser.
+3. Click “Work with Local Repository” and select this repository root.
+4. Edit content, preview the site, then commit and push changes with Git.
+
+Production CMS workflow:
+
+1. Deploy a Sveltia CMS Authenticator for GitHub OAuth.
+2. Set `base_url` in `public/admin/config.yml` to that authenticator URL.
+3. Editors sign in with GitHub and create commits against `Cognitive-Shift-Project/blog`.
+
+Draft posts stay hidden from listings, tags, search, RSS, and generated post routes. Draft skills articles
+stay hidden from `/skills/`, global search, and generated skill routes.
+
+## Skills Library
+
+Repo B (`cog-ai-intheshell/cognitive-shift`) is imported as the `/skills/` section. The editable source of
+truth is CMS-managed:
+
+- `src/content/skills/articles/<slug>/index.mdx` — article metadata and optional Markdown body
+- `src/content/skills/categories/*.json` — skills categories
+- `src/content/skills/manifest.mdx` — manifesto page
+- `src/content/skills/settings.json` — library page copy and labels
+
+Large resource files stay in `public/skills-content/articles/<slug>/` so Astro serves them directly. The
+runtime loader in `src/lib/skills.ts` normalizes CMS entries into Repo B-compatible objects with
+`contentPath`, `coverPath`, and `coverPreviewPath`.
 
 ## Contributing
 

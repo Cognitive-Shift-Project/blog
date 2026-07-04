@@ -1,0 +1,15 @@
+---
+import { ExternalLink } from '@lucide/astro'
+
+type Props = {
+	href: string
+	label: string
+}
+
+const { href, label } = Astro.props as Props
+---
+
+<a class="skills-open-button" href={href} target="_blank" rel="noopener noreferrer" aria-label={label}>
+	<span>open PDF</span>
+	<ExternalLink size={15} stroke-width={2.4} aria-hidden="true" />
+</a>

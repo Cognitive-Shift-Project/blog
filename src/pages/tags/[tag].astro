@@ -2,33 +2,31 @@
 import type { GetStaticPaths } from 'astro'
 
 import Layout from '@/layouts/Layout.astro'
-import FormattedDate from '@/components/FormattedDate.astro'
+import PostPreview from '@/components/blog/PostPreview.astro'
 import Badge from '@/components/ui/Badge.astro'
-import { getBlogPostHref, getPublishedBlogPosts, getReadTimeMinutes, getTagCounts, getTagHref } from '@/lib/blog'
-import { cn } from '@/lib/style'
+import { getTaggedContent, getUnifiedTagCounts, getUnifiedTagHref } from '@/lib/tags'
 
 type Props = {
 	tag: string
 }
 
 export const getStaticPaths = (async () => {
-	const posts = await getPublishedBlogPosts()
-
-	return getTagCounts(posts).map(({ tag }) => ({
+	return (await getUnifiedTagCounts()).map(({ tag }) => ({
 		params: { tag },
 		props: { tag },
 	}))
 }) satisfies GetStaticPaths
 
 const { tag } = Astro.props as Props
-const posts = (await getPublishedBlogPosts()).filter((post) => post.data.tags.includes(tag))
+const { posts, skills } = await getTaggedContent(tag)
+const total = posts.length + skills.length
 ---
 
 <Layout
 	meta={{
 		type: 'page',
-		title: `Posts tagged ${tag}`,
-		description: `${posts.length} Cognitive Shift Project posts tagged ${tag}.`,
+		title: `Content tagged ${tag}`,
+		description: `${total} Cognitive Shift Project items tagged ${tag}.`,
 	}}
 >
 	<section>
@@ -38,38 +36,58 @@ const posts = (await getPublishedBlogPosts()).filter((post) => post.data.tags.in
 			</a>
 			<h1 class="text-h1 text-P-heading text-balance mb-4">#{tag}</h1>
 			<div class="text-lead text-P-lead text-pretty">
-				<p>{posts.length} {posts.length === 1 ? 'post' : 'posts'} tagged with {tag}.</p>
+				<p>{total} {total === 1 ? 'item' : 'items'} tagged with {tag}.</p>
 			</div>
 		</hgroup>
-		<ul class="space-y-6">
+		<div class="space-y-10">
 			{
-				posts.map((post) => (
-					<li>
-						<a href={getBlogPostHref(post)} class="group block">
-							<h2
-								class={cn(
-									'text-xl font-semibold transition-[color,text-decoration-thickness]',
-									'underline underline-offset-2 decoration-current decoration-1 hover:decoration-[1.5px]',
-									'text-P-link group-hover:text-P-link-hover',
-								)}
-							>
-								{post.data.title}
-							</h2>
-						</a>
-						<div class="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-P-subtle">
-							<FormattedDate date={post.data.publishedAt} />
-							<span aria-hidden="true">·</span>
-							<span>{getReadTimeMinutes(post.body)} min read</span>
-						</div>
-						{post.data.description && <p class="mt-2 text-P-lead">{post.data.description}</p>}
-						<div class="mt-3 flex flex-wrap gap-2">
-							{post.data.tags.map((postTag) => (
-								<Badge content={postTag} href={getTagHref(postTag)} />
+				posts.length > 0 && (
+					<section>
+						<h2 class="mb-4 text-h3 text-P-heading">Blog</h2>
+						<ul class="space-y-6">
+							{posts.map(({ post }) => (
+								<li class="rounded-md border border-P-border bg-P-card p-4">
+									<PostPreview post={post} />
+								</li>
 							))}
-						</div>
-					</li>
-				))
+						</ul>
+					</section>
+				)
 			}
-		</ul>
+			{
+				skills.length > 0 && (
+					<section>
+						<h2 class="mb-4 text-h3 text-P-heading">Skills</h2>
+						<ul class="space-y-4">
+							{skills.map(({ item, href }) => (
+								<li class="rounded-md border border-P-border bg-P-card p-4">
+									<a href={href} class="group block no-underline">
+										<div class="flex items-start gap-4">
+											<img
+												src={item.coverPreviewPath}
+												alt=""
+												class="h-20 w-32 rounded-sm object-cover"
+												loading="lazy"
+												decoding="async"
+											/>
+											<div class="min-w-0">
+												<h3 class="text-xl font-semibold text-P-link group-hover:text-P-link-hover">{item.name}</h3>
+												<p class="mt-1 text-sm text-P-subtle">Skills · {item.type}</p>
+												<p class="mt-2 text-P-lead">{item.description}</p>
+											</div>
+										</div>
+									</a>
+									<div class="mt-3 flex flex-wrap gap-2">
+										{[item.category, ...item.keywords].map((skillTag) => (
+											<Badge content={skillTag} href={getUnifiedTagHref(skillTag)} />
+										))}
+									</div>
+								</li>
+							))}
+						</ul>
+					</section>
+				)
+			}
+		</div>
 	</section>
 </Layout>

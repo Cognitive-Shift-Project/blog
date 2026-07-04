@@ -1,0 +1,11 @@
+---
+type Props = {
+	src: string
+	alt?: string
+	class?: string
+}
+
+const { src, alt = '', class: className } = Astro.props as Props
+---
+
+<img class={className} src={src} alt={alt} loading="lazy" decoding="async" />

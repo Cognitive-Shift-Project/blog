@@ -1,16 +1,11 @@
 ---
 import Layout from '@/layouts/Layout.astro'
-import FormattedDate from '@/components/FormattedDate.astro'
-import Badge from '@/components/ui/Badge.astro'
+import PostPreview from '@/components/blog/PostPreview.astro'
 import {
 	BLOG_POSTS_PER_PAGE,
-	getBlogPostHref,
 	getPublishedBlogPosts,
-	getReadTimeMinutes,
-	getTagHref,
 	groupPostsByMonth,
 } from '@/lib/blog'
-import { cn } from '@/lib/style'
 
 const title = 'Blog'
 const allPosts = await getPublishedBlogPosts()
@@ -39,34 +34,11 @@ const groupedPosts = groupPostsByMonth(posts)
 					<section>
 						<h2 class="mb-4 border-b border-P-border pb-2 text-h3 text-P-heading">{period}</h2>
 						<ul class="space-y-6">
-							{periodPosts.map((post) => (
-								<li>
-									<a href={getBlogPostHref(post)} class="group block">
-										<h3
-											class={cn(
-												'text-xl font-semibold transition-[color,text-decoration-thickness]',
-												'underline underline-offset-2 decoration-current decoration-1 hover:decoration-[1.5px]',
-												'text-P-link group-hover:text-P-link-hover',
-											)}
-										>
-											{post.data.title}
-										</h3>
-									</a>
-									<div class="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-P-subtle">
-										<FormattedDate date={post.data.publishedAt} />
-										<span aria-hidden="true">·</span>
-										<span>{getReadTimeMinutes(post.body)} min read</span>
-									</div>
-									{post.data.description && <p class="mt-2 text-P-lead">{post.data.description}</p>}
-									{post.data.tags.length > 0 && (
-										<div class="mt-3 flex flex-wrap gap-2">
-											{post.data.tags.map((tag) => (
-												<Badge content={tag} href={getTagHref(tag)} />
-											))}
-										</div>
-									)}
-								</li>
-							))}
+						{periodPosts.map((post) => (
+							<li>
+								<PostPreview post={post} />
+							</li>
+						))}
 						</ul>
 					</section>
 				))

@@ -1,0 +1,34 @@
+---
+import SkillCoverImage from '@/components/skills/atoms/SkillCoverImage.astro'
+import SkillDownloadButton from '@/components/skills/atoms/SkillDownloadButton.astro'
+import SkillOpenButton from '@/components/skills/atoms/SkillOpenButton.astro'
+import SkillResourceBadge from '@/components/skills/atoms/SkillResourceBadge.astro'
+import type { NormalizedSkillArticle } from '@/lib/skills'
+import { getUnifiedTagHref } from '@/lib/tags'
+
+type Props = {
+	article: NormalizedSkillArticle
+}
+
+const { article } = Astro.props as Props
+const tags = [...new Set([article.category, ...article.keywords].filter(Boolean))]
+---
+
+<aside class="skills-sidebar">
+	<SkillCoverImage class="skills-sidebar-cover" src={article.coverPreviewPath} />
+	<h1>{article.name}</h1>
+	{
+		tags.length > 0 && (
+			<div class="skills-keywords" aria-label="Keywords">
+				{tags.map((tag) => (
+					<SkillResourceBadge label={tag} href={getUnifiedTagHref(tag)} />
+				))}
+			</div>
+		)
+	}
+	<p>{article.description || article.shortDescription}</p>
+	<div class="skills-resource-actions">
+		<SkillDownloadButton href={article.contentPath} label={`Download ${article.name}`} />
+		{article.type === 'pdf' && <SkillOpenButton href={article.contentPath} label={`Open ${article.name} PDF in a new tab`} />}
+	</div>
+</aside>

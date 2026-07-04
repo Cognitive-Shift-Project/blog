@@ -5,7 +5,7 @@
 @theme {
 	--text-tiny: 0.625rem;
 	--text-tiny--line-height: 1.5rem;
-	--text-tiny--letter-spacing: 0.125rem;
+	--text-tiny--letter-spacing: 0;
 	--text-tiny--font-weight: 500;
 
 	--text-lead: clamp(1.0625em, 0.9125em + 0.75vw, 1.25em);
@@ -30,17 +30,17 @@
 
 	--text-h4: 1.0625em;
 	--text-h4--line-height: 1.4;
-	--text-h4--letter-spacing: -0.01em;
+	--text-h4--letter-spacing: 0;
 	--text-h4--font-weight: 600;
 
 	--text-h5: 0.875em;
 	--text-h5--line-height: 1.4;
-	--text-h5--letter-spacing: 0.025em;
+	--text-h5--letter-spacing: 0;
 	--text-h5--font-weight: 700;
 
 	--text-h6: 0.8125em;
 	--text-h6--line-height: 1.4;
-	--text-h6--letter-spacing: 0.025em;
+	--text-h6--letter-spacing: 0;
 	--text-h6--font-weight: 700;
 }
 
@@ -123,13 +123,35 @@
 	/* links */
 
 	& :where(a):not(:where(.not-prose, .not-prose *)) {
-		@apply font-medium underline decoration-current decoration-1 underline-offset-[0.2em];
-		@apply transition-[color,text-decoration-thickness] duration-150 ease-in-out;
 		@apply text-P-link;
+		background-image:
+			linear-gradient(color-mix(in oklch, currentColor 44%, transparent), color-mix(in oklch, currentColor 44%, transparent)),
+			linear-gradient(currentColor, currentColor);
+		background-position:
+			0 100%,
+			0 100%;
+		background-repeat: no-repeat;
+		background-size:
+			100% 1px,
+			0 1px;
+		box-decoration-break: clone;
+		font-weight: 500;
+		text-decoration-line: none;
+		transition:
+			background-position 320ms ease,
+			background-size 260ms ease,
+			color 150ms ease-in-out;
+		-webkit-box-decoration-break: clone;
 	}
 
-	& :where(a):hover:not(:where(.not-prose, .not-prose *)) {
-		@apply decoration-[1.5px] text-P-link-hover;
+	& :where(a):is(:hover, :focus-visible):not(:where(.not-prose, .not-prose *)) {
+		@apply text-P-link-hover;
+		background-position:
+			0 100%,
+			100% 100%;
+		background-size:
+			100% 1px,
+			34% 1px;
 	}
 
 	/* blockquote */
@@ -179,6 +201,7 @@
 	/* code elements inside anchor inherits link colors */
 	& :where(a code):not(:where(.not-prose, .not-prose *)) {
 		@apply text-inherit;
+		background: color-mix(in oklch, currentColor 10%, transparent);
 	}
 
 	/* code fence blocks with important override of astro-shiki background */

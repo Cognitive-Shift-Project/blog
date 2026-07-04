@@ -1,0 +1,20 @@
+---
+import SkillArticleCard from '@/components/skills/molecules/SkillArticleCard.astro'
+import type { SkillCategoryGroup } from '@/lib/skills'
+
+type Props = {
+	group: SkillCategoryGroup
+}
+
+const { group } = Astro.props as Props
+---
+
+<section class="skills-category" data-skills-category>
+	<header class="skills-category-header">
+		<h2>{group.category.data.name}</h2>
+		{group.category.data.description && <p>{group.category.data.description}</p>}
+	</header>
+	<div class="skills-grid">
+		{group.articles.map((article) => <SkillArticleCard article={article} />)}
+	</div>
+</section>

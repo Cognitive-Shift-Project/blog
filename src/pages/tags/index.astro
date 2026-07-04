@@ -1,9 +1,14 @@
 ---
 import Layout from '@/layouts/Layout.astro'
-import Badge from '@/components/ui/Badge.astro'
-import { getPublishedBlogPosts, getTagCounts, getTagHref } from '@/lib/blog'
+import { getUnifiedTagCounts, getUnifiedTagHref } from '@/lib/tags'
 
-const tags = getTagCounts(await getPublishedBlogPosts())
+const tags = await getUnifiedTagCounts()
+const totalTags = tags.length
+const totalReferences = tags.reduce((sum, tag) => sum + tag.count, 0)
+const blogOnlyTags = tags.filter((tag) => tag.blogCount > 0 && tag.skillsCount === 0).length
+const skillsOnlyTags = tags.filter((tag) => tag.skillsCount > 0 && tag.blogCount === 0).length
+const mixedTags = tags.filter((tag) => tag.blogCount > 0 && tag.skillsCount > 0).length
+const popularTags = tags.slice(0, 6)
 ---
 
 <Layout
@@ -17,11 +22,224 @@ const tags = getTagCounts(await getPublishedBlogPosts())
 		<hgroup class="mb-8 sm:mb-12">
 			<h1 class="text-h1 text-P-heading text-balance mb-4">Tags</h1>
 			<div class="text-lead text-P-lead text-pretty">
-				<p>Browse posts by topic.</p>
+				<p>Browse essays and skills resources by topic, source, or recurring theme.</p>
 			</div>
 		</hgroup>
-		<div class="flex flex-wrap gap-3">
-			{tags.map(({ tag, count }) => <Badge content={`${tag} (${count})`} href={getTagHref(tag)} />)}
+
+		<div class="mb-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+			<div class="rounded-md border border-P-border bg-P-card p-4">
+				<p class="text-sm font-semibold text-P-subtle">Topics</p>
+				<p class="mt-2 text-3xl font-bold text-P-heading">{totalTags}</p>
+			</div>
+			<div class="rounded-md border border-P-border bg-P-card p-4">
+				<p class="text-sm font-semibold text-P-subtle">Tagged items</p>
+				<p class="mt-2 text-3xl font-bold text-P-heading">{totalReferences}</p>
+			</div>
+			<div class="rounded-md border border-P-border bg-P-card p-4">
+				<p class="text-sm font-semibold text-P-subtle">Shared topics</p>
+				<p class="mt-2 text-3xl font-bold text-P-heading">{mixedTags}</p>
+			</div>
+			<div class="rounded-md border border-P-border bg-P-card p-4">
+				<p class="text-sm font-semibold text-P-subtle">Source split</p>
+				<p class="mt-2 text-sm font-semibold text-P-heading">{blogOnlyTags} blog-only · {skillsOnlyTags} skills-only</p>
+			</div>
+		</div>
+
+		{
+			popularTags.length > 0 && (
+				<section class="mb-10">
+					<h2 class="mb-3 text-sm font-bold uppercase tracking-wide text-P-subtle">Most used</h2>
+					<div class="flex flex-wrap gap-2">
+						{popularTags.map(({ tag, count }) => (
+							<a
+								href={getUnifiedTagHref(tag)}
+								class="rounded-full border border-P-border bg-P-card px-3 py-1.5 text-sm font-semibold text-P-link no-underline transition-colors hover:border-P-ring hover:bg-P-muted hover:text-P-link-hover"
+							>
+								{tag}
+								<span class="ml-1 text-P-subtle">{count}</span>
+							</a>
+						))}
+					</div>
+				</section>
+			)
+		}
+
+		<div class="mb-6 grid gap-3 lg:grid-cols-[minmax(0,1fr)_auto]" data-tags-controls>
+			<label class="flex min-h-12 items-center gap-3 rounded-md border border-P-border bg-P-card px-4 focus-within:border-P-ring focus-within:ring-2 focus-within:ring-P-ring/20">
+				<span class="text-sm font-semibold text-P-subtle">Search</span>
+				<input
+					type="search"
+					class="min-w-0 flex-1 bg-transparent text-base text-P-fg outline-none placeholder:text-P-subtle"
+					placeholder="Filter tags"
+					autocomplete="off"
+					data-tags-search
+				/>
+			</label>
+			<div class="flex flex-wrap gap-2" aria-label="Filter tags by source">
+				<button type="button" class="tag-filter-button" data-tag-filter="all" aria-pressed="true">All</button>
+				<button type="button" class="tag-filter-button" data-tag-filter="blog">Blog</button>
+				<button type="button" class="tag-filter-button" data-tag-filter="skills">Skills</button>
+			</div>
+		</div>
+
+		<div class="overflow-hidden rounded-md border border-P-border bg-P-card">
+			<div class="grid grid-cols-[minmax(0,1fr)_auto] gap-4 border-b border-P-border px-4 py-3 text-xs font-bold uppercase tracking-wide text-P-subtle sm:grid-cols-[minmax(0,1fr)_6rem_6rem_6rem]">
+				<span>Topic</span>
+				<span class="hidden text-right sm:block">Blog</span>
+				<span class="hidden text-right sm:block">Skills</span>
+				<span class="text-right">Total</span>
+			</div>
+			<ul class="divide-y divide-P-border" data-tags-list>
+				{
+					tags.map(({ tag, count, blogCount, skillsCount }) => {
+						const source =
+							blogCount > 0 && skillsCount > 0 ? 'mixed' : blogCount > 0 ? 'blog' : skillsCount > 0 ? 'skills' : 'empty'
+						return (
+							<li
+								class="tag-row"
+								data-tag-row
+								data-tag-name={tag.toLowerCase()}
+								data-tag-source={source}
+								data-blog-count={blogCount}
+								data-skills-count={skillsCount}
+							>
+								<a href={getUnifiedTagHref(tag)} class="tag-row-link">
+									<span class="min-w-0">
+										<span class="tag-row-title block truncate text-lg font-semibold">{tag}</span>
+										<span class="mt-1 flex flex-wrap gap-2 text-sm text-P-subtle">
+											{blogCount > 0 && <span>{blogCount} blog</span>}
+											{skillsCount > 0 && <span>{skillsCount} skills</span>}
+										</span>
+									</span>
+									<span class="hidden text-right font-semibold text-P-heading sm:block">{blogCount}</span>
+									<span class="hidden text-right font-semibold text-P-heading sm:block">{skillsCount}</span>
+									<span class="rounded-full bg-P-muted px-2.5 py-1 text-sm font-bold text-P-heading">{count}</span>
+								</a>
+							</li>
+						)
+					})
+				}
+			</ul>
+			<p class="px-4 py-10 text-center text-P-subtle" data-tags-empty hidden>No tags match this filter.</p>
 		</div>
 	</section>
 </Layout>
+
+<script>
+	const setupTagsPage = () => {
+		const controls = document.querySelector('[data-tags-controls]')
+		const searchInput = document.querySelector<HTMLInputElement>('[data-tags-search]')
+		const filterButtons = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-tag-filter]'))
+		const rows = Array.from(document.querySelectorAll<HTMLElement>('[data-tag-row]'))
+		const emptyState = document.querySelector<HTMLElement>('[data-tags-empty]')
+
+		if (!(controls instanceof HTMLElement) || !searchInput || !emptyState || controls.dataset.ready === 'true') return
+		controls.dataset.ready = 'true'
+
+		let activeFilter = 'all'
+
+		const applyFilter = () => {
+			const query = searchInput.value.trim().toLowerCase()
+			let visibleCount = 0
+
+			for (const row of rows) {
+				const tagName = row.dataset.tagName ?? ''
+				const source = row.dataset.tagSource ?? ''
+				const matchesQuery = query === '' || tagName.includes(query)
+				const matchesFilter = activeFilter === 'all' || source === activeFilter
+				const visible = matchesQuery && matchesFilter
+
+				row.hidden = !visible
+				if (visible) visibleCount += 1
+			}
+
+			emptyState.hidden = visibleCount > 0
+		}
+
+		searchInput.addEventListener('input', applyFilter)
+
+		for (const button of filterButtons) {
+			button.addEventListener('click', () => {
+				activeFilter = button.dataset.tagFilter ?? 'all'
+				for (const candidate of filterButtons) {
+					candidate.setAttribute('aria-pressed', String(candidate === button))
+				}
+				applyFilter()
+			})
+		}
+
+		applyFilter()
+	}
+
+	setupTagsPage()
+	document.addEventListener('astro:page-load', setupTagsPage)
+</script>
+
+<style>
+	.tag-filter-button {
+		align-items: center;
+		background: var(--P-card);
+		border: 1px solid var(--P-border);
+		border-radius: 0.375rem;
+		color: var(--P-link);
+		cursor: pointer;
+		display: inline-flex;
+		font: inherit;
+		font-size: 0.9375rem;
+		font-weight: 700;
+		min-height: 3rem;
+		padding: 0 0.9rem;
+		transition:
+			background-color 150ms ease,
+			border-color 150ms ease,
+			color 150ms ease;
+	}
+
+	.tag-filter-button:hover {
+		background: var(--P-muted);
+		border-color: var(--P-ring);
+		color: var(--P-link-hover);
+	}
+
+	.tag-filter-button[aria-pressed='true'] {
+		background: var(--P-link);
+		border-color: var(--P-link);
+		color: var(--P-bg);
+	}
+
+	.tag-row[hidden] {
+		display: none;
+	}
+
+	.tag-row-link {
+		align-items: center;
+		color: inherit;
+		display: grid;
+		gap: 1rem;
+		grid-template-columns: minmax(0, 1fr) auto;
+		padding: 1rem;
+		text-decoration: none;
+		transition:
+			background-color 150ms ease,
+			color 150ms ease;
+	}
+
+	.tag-row-link:hover {
+		background: var(--P-muted);
+		text-decoration: none;
+	}
+
+	.tag-row-title {
+		color: var(--P-link);
+	}
+
+	.tag-row-link:hover .tag-row-title {
+		color: var(--P-link-hover);
+	}
+
+	@media (min-width: 640px) {
+		.tag-row-link {
+			grid-template-columns: minmax(0, 1fr) 6rem 6rem 6rem;
+		}
+	}
+</style>

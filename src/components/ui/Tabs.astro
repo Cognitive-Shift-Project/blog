@@ -6,15 +6,15 @@ const { tabs } = Astro.props
 ---
 
 <div
-	class="tabs-container block my-6 border border-neutral-200 dark:border-neutral-800 rounded-lg overflow-hidden relative"
+	class="tabs-container block my-6 border border-P-border rounded-md overflow-hidden relative"
 >
 	<div
-		class="tab-triggers flex overflow-x-auto border-b border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+		class="tab-triggers flex overflow-x-auto border-b border-P-border bg-P-muted [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
 	>
 		{
 			tabs.map((tab, i) => (
 				<button
-					class="tab-trigger px-4 py-2.5 text-sm transition-colors text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white shrink-0 aria-selected:relative aria-selected:text-indigo-600 dark:aria-selected:text-indigo-400 aria-selected:font-medium aria-selected:after:content-[''] aria-selected:after:absolute aria-selected:after:bottom-[-1px] aria-selected:after:left-0 aria-selected:after:right-0 aria-selected:after:h-[2px] aria-selected:after:bg-current"
+					class="tab-trigger px-4 py-2.5 text-sm transition-colors text-P-subtle hover:text-P-heading shrink-0 aria-selected:relative aria-selected:text-P-link aria-selected:font-medium aria-selected:after:content-[''] aria-selected:after:absolute aria-selected:after:bottom-[-1px] aria-selected:after:left-0 aria-selected:after:right-0 aria-selected:after:h-[2px] aria-selected:after:bg-current"
 					aria-selected={i === 0 ? 'true' : 'false'}
 				>
 					{tab}
@@ -22,7 +22,7 @@ const { tabs } = Astro.props
 			))
 		}
 	</div>
-	<div class="tab-panels p-0 m-0 bg-white dark:bg-neutral-950">
+	<div class="tab-panels p-0 m-0 bg-P-card">
 		<slot />
 	</div>
 </div>
