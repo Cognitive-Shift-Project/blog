@@ -1,0 +1,27 @@
+---
+import Layout from '@/layouts/Layout.astro'
+import Badge from '@/components/ui/Badge.astro'
+import { getPublishedBlogPosts, getTagCounts, getTagHref } from '@/lib/blog'
+
+const tags = getTagCounts(await getPublishedBlogPosts())
+---
+
+<Layout
+	meta={{
+		type: 'page',
+		title: 'Tags',
+		description: 'Browse Cognitive Shift Project posts by topic.',
+	}}
+>
+	<section>
+		<hgroup class="mb-8 sm:mb-12">
+			<h1 class="text-h1 text-P-heading text-balance mb-4">Tags</h1>
+			<div class="text-lead text-P-lead text-pretty">
+				<p>Browse posts by topic.</p>
+			</div>
+		</hgroup>
+		<div class="flex flex-wrap gap-3">
+			{tags.map(({ tag, count }) => <Badge content={`${tag} (${count})`} href={getTagHref(tag)} />)}
+		</div>
+	</section>
+</Layout>

@@ -11,11 +11,11 @@ const { content, href } = Astro.props
 	href ? (
 		<a
 			href={href}
-			class="text-sm text-muted-foreground rounded-full bg-muted px-3 py-1 hover:bg-primary/10 hover:text-primary transition-colors"
+			class="inline-flex rounded-full bg-P-muted px-3 py-1 text-sm font-medium text-P-muted-fg no-underline transition-colors hover:bg-P-accent hover:text-P-link"
 		>
 			{content}
 		</a>
 	) : (
-		<span class="text-sm text-muted-foreground rounded-full bg-muted px-3 py-1">{content}</span>
+		<span class="inline-flex rounded-full bg-P-muted px-3 py-1 text-sm font-medium text-P-muted-fg">{content}</span>
 	)
 }

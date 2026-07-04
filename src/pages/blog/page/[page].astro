@@ -1,4 +1,6 @@
 ---
+import type { GetStaticPaths } from 'astro'
+
 import Layout from '@/layouts/Layout.astro'
 import FormattedDate from '@/components/FormattedDate.astro'
 import Badge from '@/components/ui/Badge.astro'
@@ -12,25 +14,45 @@ import {
 } from '@/lib/blog'
 import { cn } from '@/lib/style'
 
-const title = 'Blog'
+type Props = {
+	page: number
+	totalPages: number
+}
+
+export const getStaticPaths = (async () => {
+	const posts = await getPublishedBlogPosts()
+	const totalPages = Math.ceil(posts.length / BLOG_POSTS_PER_PAGE)
+
+	return Array.from({ length: Math.max(0, totalPages - 1) }, (_, index) => {
+		const page = index + 2
+		return {
+			params: { page: String(page) },
+			props: { page, totalPages },
+		}
+	})
+}) satisfies GetStaticPaths
+
+const { page, totalPages } = Astro.props as Props
 const allPosts = await getPublishedBlogPosts()
-const posts = allPosts.slice(0, BLOG_POSTS_PER_PAGE)
-const totalPages = Math.ceil(allPosts.length / BLOG_POSTS_PER_PAGE)
+const posts = allPosts.slice((page - 1) * BLOG_POSTS_PER_PAGE, page * BLOG_POSTS_PER_PAGE)
 const groupedPosts = groupPostsByMonth(posts)
 ---
 
 <Layout
 	meta={{
 		type: 'page',
-		title,
+		title: `Blog - Page ${page}`,
 		description: 'Analyses, paper reviews, and experiment logs from the Cognitive Shift Project collective.',
 	}}
 >
 	<section>
 		<hgroup class="mb-8 sm:mb-12">
-			<h1 class="text-h1 text-P-heading text-balance mb-4">{title}</h1>
+			<a class="mb-6 inline-block text-sm font-semibold text-P-link no-underline hover:text-P-link-hover" href="/blog/">
+				Back to blog
+			</a>
+			<h1 class="text-h1 text-P-heading text-balance mb-4">Blog</h1>
 			<div class="text-lead text-P-lead text-pretty">
-				<p>Analyses, paper reviews, and experiment logs from the collective.</p>
+				<p>Page {page} of {totalPages}</p>
 			</div>
 		</hgroup>
 		<div class="space-y-12">
@@ -72,22 +94,23 @@ const groupedPosts = groupPostsByMonth(posts)
 				))
 			}
 		</div>
-		{
-			totalPages > 1 && (
-				<nav class="mt-12 flex justify-center gap-2" aria-label="Blog pagination">
-					<span class="rounded-sm bg-P-link px-3 py-2 text-sm font-semibold text-P-bg" aria-current="page">
-						1
-					</span>
-					{Array.from({ length: totalPages - 1 }, (_, index) => index + 2).map((page) => (
+		<nav class="mt-12 flex justify-center gap-2" aria-label="Blog pagination">
+			{
+				Array.from({ length: totalPages }, (_, index) => index + 1).map((pageNumber) =>
+					pageNumber === page ? (
+						<span class="rounded-sm bg-P-link px-3 py-2 text-sm font-semibold text-P-bg" aria-current="page">
+							{pageNumber}
+						</span>
+					) : (
 						<a
-							href={`/blog/page/${page}/`}
+							href={pageNumber === 1 ? '/blog/' : `/blog/page/${pageNumber}/`}
 							class="rounded-sm px-3 py-2 text-sm font-semibold text-P-link no-underline transition-colors hover:bg-P-muted hover:text-P-link-hover"
 						>
-							{page}
+							{pageNumber}
 						</a>
-					))}
-				</nav>
-			)
-		}
+					),
+				)
+			}
+		</nav>
 	</section>
 </Layout>

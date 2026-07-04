@@ -1,0 +1,49 @@
+---
+import { Check, Copy } from '@lucide/astro'
+
+type Props = {
+	url: string
+	title: string
+}
+
+const { url, title } = Astro.props as Props
+---
+
+<div class="not-prose flex flex-wrap items-center gap-3" aria-label={`Share ${title}`}>
+	<button
+		type="button"
+		data-share-copy={url}
+		class="share-copy-button inline-flex items-center gap-2 rounded-full border border-P-border bg-P-card px-3 py-1.5 text-sm font-medium text-P-link transition-colors hover:bg-P-muted hover:text-P-link-hover"
+	>
+		<Copy class="share-copy-idle size-4" aria-hidden="true" />
+		<Check class="share-copy-done hidden size-4" aria-hidden="true" />
+		<span class="share-copy-label">Copy link</span>
+	</button>
+</div>
+
+<script>
+	const buttons = document.querySelectorAll<HTMLButtonElement>('[data-share-copy]')
+
+	for (const button of buttons) {
+		button.addEventListener('click', async () => {
+			const url = button.dataset.shareCopy
+			if (!url) return
+
+			await navigator.clipboard.writeText(url)
+
+			const label = button.querySelector('.share-copy-label')
+			const idleIcon = button.querySelector('.share-copy-idle')
+			const doneIcon = button.querySelector('.share-copy-done')
+
+			if (label) label.textContent = 'Copied'
+			idleIcon?.classList.add('hidden')
+			doneIcon?.classList.remove('hidden')
+
+			window.setTimeout(() => {
+				if (label) label.textContent = 'Copy link'
+				idleIcon?.classList.remove('hidden')
+				doneIcon?.classList.add('hidden')
+			}, 1800)
+		})
+	}
+</script>

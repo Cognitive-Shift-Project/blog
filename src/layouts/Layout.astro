@@ -2,6 +2,7 @@
 import '@/styles/global.css'
 import { ClientRouter } from 'astro:transitions'
 import { Font } from 'astro:assets'
+import { Moon, Search, Sun } from '@lucide/astro'
 import { DEFAULT_LOCALE, LAYOUT_NAV_LINKS } from '@/constants'
 import { cn } from '@/lib/style'
 import { SITE_BRAND_NAME } from '@/constants'
@@ -9,6 +10,8 @@ import type { SeoMeta, SeoMetaType } from '@/seo.types'
 import HeadSeoMeta from '@/components/HeadSeoMeta.astro'
 import { ensureTrailingSlash } from '@/lib/slashes'
 import Logo from '@/components/Logo.astro'
+import SearchOverlay from '@/components/blog/SearchOverlay.astro'
+import CustomCursor from '@/components/blog/CustomCursor.astro'
 
 type Props = {
 	variant?: 'page' | 'post' | 'layout' | 'full'
@@ -61,6 +64,11 @@ const containerPaddingClassName = cn('px-4 py-8 sm:py-12 md:py-16')
 		<Font cssVariable="--font-atkinson-mono" preload />
 
 		<HeadSeoMeta canonicalUrl={canonicalUrl} meta={meta} />
+		<script is:inline>
+			const storedTheme = localStorage.getItem('theme')
+			const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+			document.documentElement.classList.toggle('dark', storedTheme ? storedTheme === 'dark' : prefersDark)
+		</script>
 		<ClientRouter />
 	</head>
 	<body class="flex flex-col min-h-dvh antialiased bg-P-bg text-P-fg">
@@ -71,7 +79,7 @@ const containerPaddingClassName = cn('px-4 py-8 sm:py-12 md:py-16')
 				<a href="/" class="nav-home" aria-current={isCurrentPathname('/') ? 'page' : undefined}
 					><Logo class="h-6 w-auto" /></a
 				>
-				<ul class="flex gap-6">
+				<ul class="flex items-center gap-6">
 					{
 						LAYOUT_NAV_LINKS.map((link) => (
 							<li>
@@ -86,6 +94,29 @@ const containerPaddingClassName = cn('px-4 py-8 sm:py-12 md:py-16')
 							</li>
 						))
 					}
+					<li>
+						<button
+							type="button"
+							class="nav-icon-button"
+							data-theme-toggle
+							aria-label="Toggle dark mode"
+							title="Toggle dark mode"
+						>
+							<Moon class="size-5 dark:hidden" aria-hidden="true" />
+							<Sun class="hidden size-5 dark:block" aria-hidden="true" />
+						</button>
+					</li>
+					<li>
+						<button
+							type="button"
+							class="nav-icon-button"
+							data-search-open
+							aria-label="Search posts"
+							title="Search posts"
+						>
+							<Search class="size-5" aria-hidden="true" />
+						</button>
+					</li>
 				</ul>
 			</nav>
 		</header>
@@ -114,6 +145,22 @@ const containerPaddingClassName = cn('px-4 py-8 sm:py-12 md:py-16')
 				{new Date().getFullYear()}
 			</div>
 		</footer>
+		<CustomCursor />
+		<SearchOverlay />
+		<script is:inline>
+			const applyTheme = (theme) => {
+				document.documentElement.classList.toggle('dark', theme === 'dark')
+				localStorage.setItem('theme', theme)
+			}
+
+			document.addEventListener('click', (event) => {
+				const button = event.target instanceof Element ? event.target.closest('[data-theme-toggle]') : null
+				if (!button) return
+
+				const isDark = document.documentElement.classList.contains('dark')
+				applyTheme(isDark ? 'light' : 'dark')
+			})
+		</script>
 	</body>
 </html>
 
@@ -130,5 +177,10 @@ const containerPaddingClassName = cn('px-4 py-8 sm:py-12 md:py-16')
 		@apply text-P-link hover:text-P-link-hover;
 		@apply underline-offset-2 decoration-current decoration-[1.5px];
 		@apply hover:underline data-active:underline;
+	}
+
+	.nav-icon-button {
+		@apply inline-flex size-9 items-center justify-center rounded-sm text-P-link transition-colors;
+		@apply hover:bg-P-muted hover:text-P-link-hover;
 	}
 </style>

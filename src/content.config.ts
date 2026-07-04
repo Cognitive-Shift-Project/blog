@@ -37,6 +37,7 @@ const blogCollection = defineCollection({
 			description: z.string().optional(),
 			publishedAt: z.coerce.date(),
 			updatedAt: z.coerce.date().optional(),
+			tags: z.array(z.string()).default([]),
 			draft: z.boolean().default(false),
 		}),
 })

@@ -1,44 +1,94 @@
 @theme inline {
 	/* global layout */
-	--color-P-bg: var(--color-neutral-50);
-	--color-P-fg: var(--color-neutral-800);
+	--color-P-bg: var(--P-bg);
+	--color-P-fg: var(--P-fg);
 
 	/* global ui chrome */
-	--color-P-selection: var(--color-sky-200);
-	--color-P-selection-fg: var(--color-neutral-900);
-	--color-P-scrollbar-track: transparent;
-	--color-P-scrollbar-thumb: var(--color-neutral-300);
+	--color-P-selection: var(--P-selection);
+	--color-P-selection-fg: var(--P-selection-fg);
+	--color-P-scrollbar-track: var(--P-scrollbar-track);
+	--color-P-scrollbar-thumb: var(--P-scrollbar-thumb);
 
 	/* typographical */
-	--color-P-lead: var(--color-neutral-600);
-	--color-P-subtle: var(--color-neutral-500);
-	--color-P-bullet: var(--color-neutral-600);
-	--color-P-heading: var(--color-neutral-700);
-	--color-P-strong: var(--color-neutral-700);
-	--color-P-link: var(--color-sky-700);
-	--color-P-link-hover: oklch(54.40% 0.146 242.36); /* precomputed 50% color-mix to sky-800 */
+	--color-P-lead: var(--P-lead);
+	--color-P-subtle: var(--P-subtle);
+	--color-P-bullet: var(--P-bullet);
+	--color-P-heading: var(--P-heading);
+	--color-P-strong: var(--P-strong);
+	--color-P-link: var(--P-link);
+	--color-P-link-hover: var(--P-link-hover);
 
 	/* highlight (<mark>) */
-	--color-P-highlight: var(--color-yellow-200);
+	--color-P-highlight: var(--P-highlight);
 
 	/* core ui */
-	--color-P-border: var(--color-neutral-200);
-	--color-P-ring: var(--color-sky-300);
+	--color-P-border: var(--P-border);
+	--color-P-ring: var(--P-ring);
 
 	/* common (base is bg and -fg suffix is legible contrast foreground) */
-	--color-P-card: var(--color-P-bg);
-	--color-P-card-fg: var(--color-P-fg);
-	--color-P-muted: var(--color-neutral-200);
-	--color-P-muted-fg: var(--color-neutral-500);
-	--color-P-accent: var(--color-neutral-200);
-	--color-P-accent-fg: var(--color-neutral-900);
+	--color-P-card: var(--P-card);
+	--color-P-card-fg: var(--P-card-fg);
+	--color-P-muted: var(--P-muted);
+	--color-P-muted-fg: var(--P-muted-fg);
+	--color-P-accent: var(--P-accent);
+	--color-P-accent-fg: var(--P-accent-fg);
 
 	/* inline code (see astro config for shiki theme) */
-	--color-P-code: var(--color-neutral-200);
-	--color-P-code-fg: var(--color-neutral-900);
+	--color-P-code: var(--P-code);
+	--color-P-code-fg: var(--P-code-fg);
 }
 
 :root {
 	--P-white: oklch(1 0 0);
 	--P-black: oklch(0 0 0);
+	--P-bg: var(--color-neutral-50);
+	--P-fg: var(--color-neutral-800);
+	--P-selection: var(--color-sky-200);
+	--P-selection-fg: var(--color-neutral-900);
+	--P-scrollbar-track: transparent;
+	--P-scrollbar-thumb: var(--color-neutral-300);
+	--P-lead: var(--color-neutral-600);
+	--P-subtle: var(--color-neutral-500);
+	--P-bullet: var(--color-neutral-600);
+	--P-heading: var(--color-neutral-700);
+	--P-strong: var(--color-neutral-700);
+	--P-link: var(--color-sky-700);
+	--P-link-hover: oklch(54.4% 0.146 242.36);
+	--P-highlight: var(--color-yellow-200);
+	--P-border: var(--color-neutral-200);
+	--P-ring: var(--color-sky-300);
+	--P-card: var(--P-bg);
+	--P-card-fg: var(--P-fg);
+	--P-muted: var(--color-neutral-200);
+	--P-muted-fg: var(--color-neutral-500);
+	--P-accent: var(--color-neutral-200);
+	--P-accent-fg: var(--color-neutral-900);
+	--P-code: var(--color-neutral-200);
+	--P-code-fg: var(--color-neutral-900);
+}
+
+.dark {
+	--P-bg: var(--color-neutral-950);
+	--P-fg: var(--color-neutral-200);
+	--P-selection: var(--color-sky-900);
+	--P-selection-fg: var(--color-sky-50);
+	--P-scrollbar-thumb: var(--color-neutral-700);
+	--P-lead: var(--color-neutral-300);
+	--P-subtle: var(--color-neutral-400);
+	--P-bullet: var(--color-neutral-300);
+	--P-heading: var(--color-neutral-50);
+	--P-strong: var(--color-neutral-50);
+	--P-link: var(--color-sky-300);
+	--P-link-hover: var(--color-sky-200);
+	--P-highlight: color-mix(in oklch, var(--color-yellow-300) 35%, transparent);
+	--P-border: var(--color-neutral-800);
+	--P-ring: var(--color-sky-600);
+	--P-card: var(--color-neutral-950);
+	--P-card-fg: var(--color-neutral-100);
+	--P-muted: var(--color-neutral-900);
+	--P-muted-fg: var(--color-neutral-400);
+	--P-accent: var(--color-neutral-800);
+	--P-accent-fg: var(--color-neutral-50);
+	--P-code: var(--color-neutral-900);
+	--P-code-fg: var(--color-neutral-100);
 }

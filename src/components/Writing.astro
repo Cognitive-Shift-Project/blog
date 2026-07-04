@@ -1,0 +1,93 @@
+---
+import FormattedDate from '@/components/FormattedDate.astro'
+import Badge from '@/components/ui/Badge.astro'
+import {
+	BLOG_POSTS_PER_PAGE,
+	getBlogPostHref,
+	getPublishedBlogPosts,
+	getReadTimeMinutes,
+	getTagHref,
+	groupPostsByMonth,
+} from '@/lib/blog'
+import { cn } from '@/lib/style'
+
+interface Props {
+	page?: number
+}
+
+const { page = 1 } = Astro.props
+const allPosts = await getPublishedBlogPosts()
+const totalPages = Math.ceil(allPosts.length / BLOG_POSTS_PER_PAGE)
+const posts = allPosts.slice((page - 1) * BLOG_POSTS_PER_PAGE, page * BLOG_POSTS_PER_PAGE)
+const groupedPosts = groupPostsByMonth(posts)
+
+const pageUrl = (pageNumber: number) => (pageNumber === 1 ? '/blog/' : `/blog/page/${pageNumber}/`)
+---
+
+<section>
+	<hgroup class="mb-8 sm:mb-12">
+		<h1 class="text-h1 text-P-heading text-balance mb-4">Blog</h1>
+		<div class="text-lead text-P-lead text-pretty">
+			<p>Analyses, paper reviews, and experiment logs from the collective.</p>
+		</div>
+	</hgroup>
+	<div class="space-y-12">
+		{
+			groupedPosts.map(({ period, posts: periodPosts }) => (
+				<section>
+					<h2 class="mb-4 border-b border-P-border pb-2 text-h3 text-P-heading">{period}</h2>
+					<ul class="space-y-6">
+						{periodPosts.map((post) => (
+							<li>
+								<a href={getBlogPostHref(post)} class="group block">
+									<h3
+										class={cn(
+											'text-xl font-semibold transition-[color,text-decoration-thickness]',
+											'underline underline-offset-2 decoration-current decoration-1 hover:decoration-[1.5px]',
+											'text-P-link group-hover:text-P-link-hover',
+										)}
+									>
+										{post.data.title}
+									</h3>
+								</a>
+								<div class="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-P-subtle">
+									<FormattedDate date={post.data.publishedAt} />
+									<span aria-hidden="true">·</span>
+									<span>{getReadTimeMinutes(post.body)} min read</span>
+								</div>
+								{post.data.description && <p class="mt-2 text-P-lead">{post.data.description}</p>}
+								{post.data.tags.length > 0 && (
+									<div class="mt-3 flex flex-wrap gap-2">
+										{post.data.tags.map((tag) => (
+											<Badge content={tag} href={getTagHref(tag)} />
+										))}
+									</div>
+								)}
+							</li>
+						))}
+					</ul>
+				</section>
+			))
+		}
+	</div>
+	{
+		totalPages > 1 && (
+			<nav class="mt-12 flex justify-center gap-2" aria-label="Blog pagination">
+				{Array.from({ length: totalPages }, (_, index) => index + 1).map((pageNumber) =>
+					pageNumber === page ? (
+						<span class="rounded-sm bg-P-link px-3 py-2 text-sm font-semibold text-P-bg" aria-current="page">
+							{pageNumber}
+						</span>
+					) : (
+						<a
+							href={pageUrl(pageNumber)}
+							class="rounded-sm px-3 py-2 text-sm font-semibold text-P-link no-underline transition-colors hover:bg-P-muted hover:text-P-link-hover"
+						>
+							{pageNumber}
+						</a>
+					),
+				)}
+			</nav>
+		)
+	}
+</section>

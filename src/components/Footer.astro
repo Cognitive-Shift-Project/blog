@@ -1,0 +1,15 @@
+---
+import { PROJECT_REPO_URL, SITE_BRAND_NAME } from '@/constants'
+---
+
+<footer class="border-t border-P-border text-lg text-P-heading">
+	<div
+		class="mx-auto flex w-full max-w-(--layout-max-width) flex-col items-center justify-between gap-3 px-4 py-4 text-center font-semibold sm:flex-row sm:text-left"
+	>
+		<span>© {SITE_BRAND_NAME} {new Date().getFullYear()}</span>
+		<div class="flex flex-wrap items-center justify-center gap-4 text-sm">
+			<a class="text-P-link no-underline hover:text-P-link-hover" href="/feed.xml">RSS</a>
+			<a class="text-P-link no-underline hover:text-P-link-hover" href={PROJECT_REPO_URL}>GitHub</a>
+		</div>
+	</div>
+</footer>

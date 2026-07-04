@@ -1,0 +1,99 @@
+---
+import { List, X } from '@lucide/astro'
+
+type Heading = {
+	depth: number
+	slug: string
+	text: string
+}
+
+type Props = {
+	headings: Heading[]
+}
+
+const { headings } = Astro.props as Props
+const visibleHeadings = headings.filter((heading) => heading.depth >= 2 && heading.depth <= 3)
+---
+
+{
+	visibleHeadings.length > 0 && (
+		<>
+			<aside class="not-prose hidden w-64 shrink-0 lg:block">
+				<div class="sticky top-8 rounded-lg border border-P-border bg-P-card p-5">
+					<h2 class="mb-4 flex items-center gap-2 text-tiny uppercase text-P-subtle">Contents</h2>
+					<ol class="space-y-3 border-s border-P-border ps-4 text-sm">
+						{visibleHeadings.map((heading) => (
+							<li class={heading.depth === 3 ? 'ps-3' : undefined}>
+								<a
+									class="toc-link text-P-subtle no-underline transition-colors hover:text-P-link"
+									href={`#${heading.slug}`}
+								>
+									{heading.text}
+								</a>
+							</li>
+						))}
+					</ol>
+				</div>
+			</aside>
+
+			<div class="not-prose fixed bottom-6 right-6 z-40 lg:hidden">
+				<div
+					id="mobile-toc-menu"
+					class="pointer-events-none absolute bottom-14 right-0 w-72 origin-bottom-right scale-95 rounded-lg border border-P-border bg-P-card p-5 opacity-0 shadow-xl transition"
+				>
+					<h2 class="mb-4 flex items-center gap-2 text-tiny uppercase text-P-subtle">Contents</h2>
+					<ol class="max-h-[60vh] space-y-3 overflow-y-auto overscroll-contain border-s border-P-border ps-4 text-sm">
+						{visibleHeadings.map((heading) => (
+							<li class={heading.depth === 3 ? 'ps-3' : undefined}>
+								<a
+									class="toc-link text-P-subtle no-underline transition-colors hover:text-P-link"
+									href={`#${heading.slug}`}
+								>
+									{heading.text}
+								</a>
+							</li>
+						))}
+					</ol>
+				</div>
+				<button
+					id="mobile-toc-toggle"
+					type="button"
+					class="inline-flex size-11 items-center justify-center rounded-full border border-P-border bg-P-link text-P-bg shadow-lg transition-transform hover:scale-105"
+					aria-label="Toggle table of contents"
+					aria-expanded="false"
+				>
+					<List class="toc-icon-open size-5" aria-hidden="true" />
+					<X class="toc-icon-close hidden size-5" aria-hidden="true" />
+				</button>
+			</div>
+		</>
+	)
+}
+
+<script>
+	const toggle = document.getElementById('mobile-toc-toggle')
+	const menu = document.getElementById('mobile-toc-menu')
+	const openIcon = document.querySelector('.toc-icon-open')
+	const closeIcon = document.querySelector('.toc-icon-close')
+
+	const setOpen = (open: boolean) => {
+		if (!toggle || !menu) return
+
+		toggle.setAttribute('aria-expanded', String(open))
+		menu.classList.toggle('pointer-events-none', !open)
+		menu.classList.toggle('opacity-0', !open)
+		menu.classList.toggle('scale-95', !open)
+		menu.classList.toggle('opacity-100', open)
+		menu.classList.toggle('scale-100', open)
+		openIcon?.classList.toggle('hidden', open)
+		closeIcon?.classList.toggle('hidden', !open)
+	}
+
+	toggle?.addEventListener('click', () => {
+		setOpen(toggle.getAttribute('aria-expanded') !== 'true')
+	})
+
+	menu?.querySelectorAll('a').forEach((link) => {
+		link.addEventListener('click', () => setOpen(false))
+	})
+</script>

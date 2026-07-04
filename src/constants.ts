@@ -20,6 +20,7 @@ export const SITE_BRAND_NAME = 'Cognitive Shift Project'
 
 export const LAYOUT_NAV_LINKS = [
 	{ label: 'Blog', href: '/blog/' },
+	{ label: 'Tags', href: '/tags/' },
 	{ label: 'Docs', href: '/docs/' },
 ]
 

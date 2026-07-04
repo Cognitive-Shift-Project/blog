@@ -1,0 +1,62 @@
+<div
+	id="cursor"
+	class="pointer-events-none fixed left-0 top-0 z-[9999] size-3 rounded-full bg-P-link opacity-0 mix-blend-difference transition-opacity"
+	aria-hidden="true"
+>
+</div>
+
+<script>
+	let cursor: HTMLElement | null = null
+	let targetX = 0
+	let targetY = 0
+	let currentX = 0
+	let currentY = 0
+	let scale = 1
+	let targetScale = 1
+	let isLoopRunning = false
+
+	const halfCursor = 6
+	const lerpFactor = 0.15
+
+	const updateCursor = () => {
+		currentX += (targetX - currentX) * lerpFactor
+		currentY += (targetY - currentY) * lerpFactor
+		scale += (targetScale - scale) * lerpFactor
+
+		if (cursor) {
+			cursor.style.transform = `translate3d(${currentX}px, ${currentY}px, 0) scale(${scale})`
+		}
+
+		requestAnimationFrame(updateCursor)
+	}
+
+	document.addEventListener('astro:page-load', () => {
+		if (!matchMedia('(pointer: fine)').matches) return
+
+		document.documentElement.classList.add('has-custom-cursor')
+		cursor = document.getElementById('cursor')
+
+		if (!isLoopRunning) {
+			updateCursor()
+			isLoopRunning = true
+		}
+	})
+
+	window.addEventListener(
+		'mousemove',
+		(event) => {
+			targetX = event.clientX - halfCursor
+			targetY = event.clientY - halfCursor
+			if (cursor) cursor.style.opacity = '1'
+		},
+		{ passive: true },
+	)
+
+	document.addEventListener(
+		'mouseover',
+		(event) => {
+			targetScale = event.target instanceof Element && event.target.closest('a, button') ? 1.8 : 1
+		},
+		{ passive: true },
+	)
+</script>

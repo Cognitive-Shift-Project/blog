@@ -2,6 +2,8 @@
 @import "./palette.css" layer(base);
 @import "./typography.css";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @source "../**/*.{ts,tsx,astro}";
 
 @theme inline {
@@ -45,6 +47,14 @@
 		scrollbar-width: thin;
 
 		@apply scroll-smooth scroll-pt-24;
+	}
+
+	@media (pointer: fine) {
+		html.has-custom-cursor,
+		html.has-custom-cursor a,
+		html.has-custom-cursor button {
+			cursor: none;
+		}
 	}
 
 	body {
